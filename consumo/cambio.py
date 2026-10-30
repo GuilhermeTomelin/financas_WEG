@@ -3,7 +3,7 @@ import math
 import requests
 
 URL_COTACAO = "https://api.frankfurter.dev/v2/rate"
-MOEDAS_SUPORTADAS = ("USD", "EUR", "BRL")
+MOEDAS_SUPORTADAS = ("BRL", "EUR", "USD", "MXN", "CLP", "ZAR")
 TIMEOUT_SEGUNDOS = 10
 
 
@@ -17,8 +17,8 @@ def consultar_cotacao(moeda_origem, moeda_destino):
 
     for moeda in (origem, destino):
         if moeda not in MOEDAS_SUPORTADAS:
-            raise ErroCambio(f"Moeda não suportada: {moeda}. Use USD, EUR ou BRL.")
-
+            opcoes = ", ".join(MOEDAS_SUPORTADAS)
+            raise ErroCambio(f"Moeda não suportada: {moeda}. Opções: {opcoes}.")
     if origem == destino:
         return {
             "origem": origem,
