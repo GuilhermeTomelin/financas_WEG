@@ -1,3 +1,8 @@
+import math
+import sqlite3
+from uuid import uuid4
+from consumo.historico import salvar
+from interface.relatorios import exibir
 from datetime import date
 from html import escape
 
@@ -168,6 +173,11 @@ st.html("""
         .block-container { padding-inline: 1rem; }
         .valor-principal { font-size: 2.5rem; }
     }
+.extremos {display:flex;flex-wrap:wrap;gap:.75rem 2rem;margin:.35rem 0 .8rem}
+    .extremos div {max-width:100%;overflow-x:auto}
+    .extremos small {display:block;color:#ACB5C6}
+    .extremos strong {white-space:nowrap;font-size:clamp(1.25rem,2vw,2.25rem);font-variant-numeric:tabular-nums}
+    @media(max-width:700px){.extremos {flex-direction:column}}
 </style>
 """)
 
@@ -187,14 +197,23 @@ with st.sidebar:
         <span>Operações</span>
     </div>
     <div class="rotulo">Área de trabalho</div>
-    <div class="secao-ativa">Conversão internacional</div>
+    
     """)
+    pagina = st.radio("Navegação", ["Simulador", "Relatórios"])
     st.divider()
     st.caption("Moeda do catálogo")
     st.write("**BRL · Real brasileiro**" if moeda_base == "BRL" else moeda_base)
     st.caption("Porto de origem")
     st.write(f"{origem['porto']} · {origem['pais']}")
     st.caption("Projeto educacional sem vínculo oficial com a WEG.")
+
+if pagina == "Relatórios":
+    # Evita a limpeza automática dos widgets ocultos do simulador.
+    for chave in list(st.session_state):
+        if chave.startswith(("entrada_", "variante_")):
+            st.session_state[chave] = st.session_state[chave]
+    exibir(moeda, mostrar_faixa, numero_br)
+    st.stop()
 
 st.title("Operações internacionais")
 st.caption("Escolha a mercadoria e o destino para simular a operação.")
@@ -207,7 +226,7 @@ with lateral.container(key="controles", border=True):
 
     produto = st.selectbox(
         "Produto",
-        catalogo["produtos"],
+        catalogo["produtos"], key="entrada_produto",
         format_func=lambda item: item["nome"],
     )
     variante = st.selectbox(
@@ -216,9 +235,9 @@ with lateral.container(key="controles", border=True):
         format_func=lambda item: item["nome"],
         key=f"variante_{produto['id']}",
     )
-    quantidade = st.number_input("Quantidade", min_value=1, value=1, step=1)
+    quantidade = st.number_input("Quantidade", min_value=1, value=1, step=1, key="entrada_qtd")
 
-    pais = st.selectbox("País de destino", list(rotas["destinos"]))
+    pais = st.selectbox("País de destino", list(rotas["destinos"]), key="entrada_pais")
     destino = rotas["destinos"][pais]
     moeda_destino = destino["moeda"]
     rota = f"{origem['porto']} → {destino['porto']}"
@@ -266,12 +285,13 @@ with principal.container(key="resumo", border=True):
         faixa_destaque = subtotal
         codigo_destaque = moeda_base
 
-    valor = mostrar_faixa(faixa_destaque, codigo_destaque)
-    st.html(f"""
-    <div class="rotulo">Subtotal da mercadoria em {escape(codigo_destaque)}</div>
-    <div class="valor-principal">{escape(valor)}</div>
-    <div class="nota">Preço simulado · somente mercadoria</div>
-    """)
+    st.caption(f"Subtotal da mercadoria em {codigo_destaque} · preço simulado")
+    extremos = [("A partir de", faixa_destaque["minimo"])] if faixa_destaque["maximo"] is None else [
+        ("Mínimo", faixa_destaque["minimo"]), ("Máximo", faixa_destaque["maximo"])]
+    blocos = "".join(
+        f'<div><small>{rotulo}</small><strong>{escape(moeda(valor, codigo_destaque))}</strong></div>'
+        for rotulo, valor in extremos)
+    st.html(f'<div class="extremos">{blocos}</div>')
     mostrar_referencia(faixa_destaque, codigo_destaque)
 
     if cambio:
@@ -284,6 +304,47 @@ with principal.container(key="resumo", border=True):
         )
     else:
         st.caption("Clique em Calcular conversão para consultar o câmbio.")
+
+with lateral:
+    comparacao = None
+    valido = bool(cambio)
+    if cambio:
+        with st.expander("Comparar taxa negociada"):
+            if st.checkbox("Usar taxa manual", key=f"entrada_comparar_{moeda_destino}"):
+                manual = st.number_input(f"Quantos {moeda_destino} correspondem a 1 BRL?",
+                                         value=None, format="%.6f", key=f"entrada_taxa_{moeda_destino}")
+                valido = manual is not None and math.isfinite(manual) and manual > 0
+                if valido:
+                    negociado = converter_faixa(subtotal, manual)
+                    diferenca = negociado["minimo"] - faixa_destaque["minimo"]
+                    percentual = (manual / cambio["cotacao"] - 1) * 100
+                    comparacao = dict(taxa=manual, negociado=negociado, diferenca=diferenca,
+                                      percentual=percentual)
+                    st.write("Referência", mostrar_faixa(faixa_destaque, moeda_destino))
+                    st.write("Hipótese negociada", mostrar_faixa(negociado, moeda_destino))
+                    st.caption(f"Impacto sobre o mínimo: {moeda(diferenca, moeda_destino)} "
+                               f"({numero_br(percentual)}%).")
+                else:
+                    st.caption("Informe uma taxa positiva para comparar e salvar.")
+
+    operacao = dict(produto_id=produto["id"], produto=produto["nome"], categoria=produto["categoria"],
+                    variante=variante["nome"], quantidade=quantidade, origem=origem, pais=pais,
+                    destino=destino, moeda=moeda_destino, moeda_base=moeda_base, unitario=variante,
+                    subtotal=subtotal, convertido=faixa_destaque, cambio=cambio, fonte_cambio="Frankfurter",
+                    tipo_preco="simulado", fonte_preco=catalogo["fonte_preco"], comparacao=comparacao)
+    if calcular or operacao != st.session_state.get("fotografia"):
+        st.session_state.fotografia = operacao
+        st.session_state.resultado_id = uuid4().hex
+        st.session_state.pop("registro_salvo", None)
+    registro = st.session_state.get("registro_salvo")
+    if st.button("Salvar simulação", disabled=not valido or bool(registro), width="stretch"):
+        try:
+            st.session_state.registro_salvo = salvar(st.session_state.resultado_id, operacao)
+            st.rerun()
+        except (sqlite3.Error, OSError):
+            st.error("Falha ao gravar. Confira a pasta dados e tente salvar novamente.")
+    if registro:
+        st.success(f"Simulação #{registro} salva.")
 
 with st.container(key="detalhes", border=True):
     st.html('<div class="rotulo">Memória da operação</div>')

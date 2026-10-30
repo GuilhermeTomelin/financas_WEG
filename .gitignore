@@ -14,3 +14,5 @@ __pycache__/
 
 # Configurações locais do editor
 .vscode/
+
+/dados/simulacoes.sqlite3*
