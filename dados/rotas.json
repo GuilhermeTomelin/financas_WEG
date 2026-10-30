@@ -1,0 +1,33 @@
+{
+  "origem": {
+    "pais": "Brasil",
+    "porto": "Santos",
+    "moeda": "BRL"
+  },
+  "destinos": {
+    "Itália": {
+      "porto": "Gioia Tauro",
+      "moeda": "EUR"
+    },
+    "Estados Unidos": {
+      "porto": "Los Angeles",
+      "moeda": "USD"
+    },
+    "Alemanha": {
+      "porto": "Hamburgo",
+      "moeda": "EUR"
+    },
+    "México": {
+      "porto": "Manzanillo",
+      "moeda": "MXN"
+    },
+    "Chile": {
+      "porto": "San Antonio",
+      "moeda": "CLP"
+    },
+    "África do Sul": {
+      "porto": "Durban",
+      "moeda": "ZAR"
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "moeda": "BRL",
+  "tipo_preco": "simulado",
+  "fonte_preco": "Tabela de estimativas fornecida pelo usuário",
+  "produtos": [
+    {
+      "id": "w22",
+      "nome": "Motor W22",
+      "categoria": "Motor industrial",
+      "variantes": [
+        {"nome": "2 CV · 2 polos · trifásico", "minimo": 1800, "maximo": 2600},
+        {"nome": "50 CV · 2 polos · trifásico", "minimo": 22000, "maximo": null, "referencia_superior": 28000}
+      ]
+    },
+    {
+      "id": "cfw300",
+      "nome": "Inversor CFW300",
+      "categoria": "Inversor de frequência",
+      "variantes": [
+        {"nome": "1 CV · 4,2 A · entrada mono/trifásica", "minimo": 1050, "maximo": 1350},
+        {"nome": "5 CV · 8,2 A · entrada trifásica 380 V", "minimo": 2500, "maximo": 3000}
+      ]
+    },
+    {
+      "id": "ssw900",
+      "nome": "Soft-starter SSW900",
+      "categoria": "Partida de motores",
+      "variantes": [
+        {"nome": "Compacta · 24 a 30 A", "minimo": 5500, "maximo": 7500},
+        {"nome": "85 A", "minimo": 9000, "maximo": 11500}
+      ]
+    },
+    {
+      "id": "clic02",
+      "nome": "CLP CLIC02",
+      "categoria": "Automação programável",
+      "variantes": [
+        {"nome": "CLW-02 · 12 entradas e saídas", "minimo": 1200, "maximo": 1500},
+        {"nome": "CLW-02 · 20 entradas e saídas · com display", "minimo": 1700, "maximo": 2300}
+      ]
+    },
+    {
+      "id": "pss24",
+      "nome": "Fonte PSS24",
+      "categoria": "Alimentação de painel",
+      "variantes": [
+        {"nome": "24 VCC · 3 a 5 A", "minimo": 400, "maximo": 600},
+        {"nome": "24 VCC · 20 A", "minimo": 1300, "maximo": 1600}
+      ]
+    },
+    {
+      "id": "cwb",
+      "nome": "Contator CWB",
+      "categoria": "Manobra elétrica",
+      "variantes": [
+        {"nome": "9 a 18 A · bobina 220 V ou 24 V", "minimo": 130, "maximo": 200},
+        {"nome": "32 a 65 A", "minimo": 280, "maximo": 700}
+      ]
+    },
+    {
+      "id": "mpw",
+      "nome": "Disjuntor-motor MPW",
+      "categoria": "Proteção de motores",
+      "variantes": [
+        {"nome": "MPW18 / MPW40 · ajustes de 1 a 32 A", "minimo": 300, "maximo": 450},
+        {"nome": "MPW80 / MPW100", "minimo": 1300, "maximo": null, "referencia_superior": 2400}
+      ]
+    },
+    {
+      "id": "rw",
+      "nome": "Relé térmico RW",
+      "categoria": "Proteção contra sobrecarga",
+      "variantes": [
+        {"nome": "RW27 · ajustes de 1 a 32 A", "minimo": 130, "maximo": 220},
+        {"nome": "RW67 · ajustes até 50 A", "minimo": 280, "maximo": 400}
+      ]
+    },
+    {
+      "id": "csw",
+      "nome": "Botão de comando CSW",
+      "categoria": "Comando e sinalização",
+      "variantes": [
+        {"nome": "Botão completo · aro e 1 bloco", "minimo": 35, "maximo": 70},
+        {"nome": "Bloco de contato auxiliar avulso", "minimo": 12, "maximo": 25}
+      ]
+    },
+    {
+      "id": "ucw",
+      "nome": "Capacitor UCW",
+      "categoria": "Correção do fator de potência",
+      "variantes": [
+        {"nome": "2,5 a 5 kVAr", "minimo": 150, "maximo": 250},
+        {"nome": "15 a 25 kVAr", "minimo": 450, "maximo": null, "referencia_superior": 800}
+      ]
+    }
+  ]
+}
