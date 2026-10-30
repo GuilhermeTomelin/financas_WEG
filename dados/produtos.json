@@ -1,0 +1,119 @@
+{
+  "aviso": "Projeto educacional sem vínculo oficial com a WEG. Especificações copiadas das páginas oficiais indicadas em fonte_url. Os preços são FICTÍCIOS, de demonstração: não são preços de venda da WEG nem custo de fabricação.",
+  "fontes_consultadas_em": "2026-10-30",
+  "produtos": [
+    {
+      "id": 1,
+      "nome": "W22 IE3 2.2 kW 4P 100L 3Ph 220-230-240/380-400-415//460 V 50 Hz IC411 - TEFC - B14T",
+      "categoria": "Motor elétrico trifásico",
+      "linha": "W22",
+      "codigo_produto_weg": "13317473",
+      "especificacoes": {
+        "norma": "IEC 60034-1",
+        "frequencia": "50 Hz",
+        "tensao": "220-230-240/380-400-415//460 V",
+        "polos": 4,
+        "grau_protecao": "IP55",
+        "velocidade_sincrona_rpm": 1500,
+        "potencia_kw": 2.2,
+        "montagem": "B14T",
+        "pes": "Footless",
+        "flange": "C-DIN",
+        "caixa_de_ligacao": "Top",
+        "refrigeracao": "IC411 - TEFC"
+      },
+      "peso_kg": null,
+      "dimensoes_mm": null,
+      "preco_venda_demonstracao_usd": 320.00,
+      "preco_e_ficticio": true,
+      "fonte_url": "https://www.weg.net/catalog/weg/FR/en///W22-IE3-2-2-kW-4P-100L-3Ph-220-230-240-380-400-415-460-V-50-Hz-IC411---TEFC---B14T/p/13317473"
+    },
+    {
+      "id": 2,
+      "nome": "W22 IE3 15 kW 2P 160M 3Ph 380-400-415/660-690//460 V 50 Hz IC411 - TEFC - B35T",
+      "categoria": "Motor elétrico trifásico",
+      "linha": "W22",
+      "codigo_produto_weg": "12881702",
+      "especificacoes": {
+        "norma": "IEC 60034-1",
+        "frequencia": "50 Hz",
+        "tensao": "380-400-415/660-690//460 V",
+        "polos": 2,
+        "grau_protecao": "IP55",
+        "velocidade_sincrona_rpm": 3000,
+        "potencia_kw": 15,
+        "montagem": "B35T",
+        "pes": "Foot-mounted",
+        "flange": "FF",
+        "caixa_de_ligacao": "Top",
+        "refrigeracao": "IC411 - TEFC"
+      },
+      "peso_kg": null,
+      "dimensoes_mm": null,
+      "preco_venda_demonstracao_usd": 1600.00,
+      "preco_e_ficticio": true,
+      "fonte_url": "https://www.weg.net/catalog/weg/FR/en///W22-IE3-15-kW-2P-160M-3Ph-380-400-415-660-690-460-V-50-Hz-IC411---TEFC---B35T/p/12881702"
+    },
+    {
+      "id": 3,
+      "nome": "DRIVE CFW500A04P3B2NB20",
+      "categoria": "Inversor de frequência",
+      "linha": "CFW500",
+      "codigo_produto_weg": "11575768",
+      "especificacoes": {
+        "alimentacao": "200-240 V",
+        "fases_entrada": "Single-phase/Three-phase",
+        "configuracao": "With options",
+        "corrente_nominal_nd": "Not applicable",
+        "corrente_nominal_hd_a": 4.3,
+        "filtro_rfi": "Without filter",
+        "grau_protecao": "IP20",
+        "frenagem_dinamica": "Standard without braking",
+        "parada_segura": "Not available",
+        "fonte_eletronica": "Not Available",
+        "tamanho": "A"
+      },
+      "peso_kg": null,
+      "dimensoes_mm": null,
+      "preco_venda_demonstracao_usd": 260.00,
+      "preco_e_ficticio": true,
+      "fonte_url": "https://www.weg.net/catalog/weg/EC/en/c/CONVERTIDOR-CFW500A04P3B2NB20/p/11575768"
+    },
+    {
+      "id": 4,
+      "nome": "MOTOR PROTECTOR BU MPW18-3-U004",
+      "categoria": "Disjuntor-motor",
+      "linha": "MPW",
+      "codigo_produto_weg": "12429370",
+      "especificacoes": {
+        "referencia": "MPW18",
+        "corrente_maxima_ie_a": 18,
+        "faixa_ajuste_disparador_termico": "2,5-4 A",
+        "tipo_terminal": "Screw"
+      },
+      "peso_kg": null,
+      "dimensoes_mm": null,
+      "preco_venda_demonstracao_usd": 28.00,
+      "preco_e_ficticio": true,
+      "fonte_url": "https://www.weg.net/catalog/p/12429370"
+    },
+    {
+      "id": 5,
+      "nome": "MOTOR PROTECTOR BU MPW40-3-U025",
+      "categoria": "Disjuntor-motor",
+      "linha": "MPW",
+      "codigo_produto_weg": "12428133",
+      "especificacoes": {
+        "referencia": "MPW40",
+        "corrente_maxima_ie_a": 40,
+        "faixa_ajuste_disparador_termico": "20-25 A",
+        "tipo_terminal": "Screw"
+      },
+      "peso_kg": null,
+      "dimensoes_mm": null,
+      "preco_venda_demonstracao_usd": 42.00,
+      "preco_e_ficticio": true,
+      "fonte_url": "https://www.weg.net/catalog/p/12428133"
+    }
+  ]
+}
