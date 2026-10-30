@@ -3,20 +3,12 @@ from html import escape
 
 import streamlit as st
 
-from calculos.operacoes import calcular_estimativa
+from calculos.operacoes import calcular_subtotal_faixa, converter_faixa
 from consumo.cambio import ErroCambio, consultar_cotacao
-from consumo.catalogo import ErroCatalogo, carregar_catalogo
+from consumo.catalogo import ErroCatalogo, carregar_dados_simulador
 
 
-CAMPO_PRECO = "preco_venda_demonstracao_usd"
-MOEDA_PRECO = "USD"
-
-DESTINOS = {
-    "Brasil (BRL)": "BRL",
-    "Itália (EUR)": "EUR",
-}
-
-SIMBOLOS = {"USD": "US$", "BRL": "R$", "EUR": "€"}
+SIMBOLOS = {"BRL": "R$", "USD": "US$", "EUR": "€"}
 SEPARADORES_BR = str.maketrans(",.", ".,")
 
 
@@ -25,22 +17,34 @@ def numero_br(valor, casas=2):
 
 
 def moeda(valor, codigo, casas=2):
-    return f"{SIMBOLOS[codigo]} {numero_br(valor, casas)}"
+    simbolo = SIMBOLOS.get(codigo, codigo)
+    return f"{simbolo} {numero_br(valor, casas)}"
+
+
+def mostrar_faixa(faixa, codigo):
+    minimo = moeda(faixa["minimo"], codigo)
+    if faixa["maximo"] is None:
+        return f"A partir de {minimo}"
+    return f"{minimo} a {moeda(faixa['maximo'], codigo)}"
+
+
+def mostrar_referencia(faixa, codigo):
+    referencia = faixa.get("referencia_superior")
+    if referencia is not None:
+        st.caption(
+            f"Referência superior em {codigo}: {moeda(referencia, codigo)}. "
+            "O valor pode ultrapassar essa referência."
+        )
 
 
 def data_cotacao(cambio):
     referencia = cambio.get("data_referencia")
-
-    if referencia:
-        try:
-            return date.fromisoformat(referencia).strftime("%d/%m/%Y")
-        except ValueError:
-            return str(referencia)
-
-    if cambio["origem"] == cambio["destino"]:
-        return "Mesma moeda"
-
-    return "Não informada"
+    if not referencia:
+        return "Não informada"
+    try:
+        return date.fromisoformat(referencia).strftime("%d/%m/%Y")
+    except ValueError:
+        return str(referencia)
 
 
 st.set_page_config(
@@ -167,6 +171,15 @@ st.html("""
 </style>
 """)
 
+try:
+    catalogo, rotas = carregar_dados_simulador()
+except ErroCatalogo as erro:
+    st.error(str(erro))
+    st.stop()
+
+moeda_base = catalogo["moeda"]
+origem = rotas["origem"]
+
 with st.sidebar:
     st.html("""
     <div class="marca">
@@ -178,23 +191,14 @@ with st.sidebar:
     """)
     st.divider()
     st.caption("Moeda do catálogo")
-    st.write("**USD · Dólar americano**")
+    st.write("**BRL · Real brasileiro**" if moeda_base == "BRL" else moeda_base)
+    st.caption("Porto de origem")
+    st.write(f"{origem['porto']} · {origem['pais']}")
     st.caption("Projeto educacional sem vínculo oficial com a WEG.")
 
 st.title("Operações internacionais")
-st.caption("Simule o valor dos produtos na moeda do país de destino.")
+st.caption("Escolha a mercadoria e o destino para simular a operação.")
 
-try:
-    produtos = carregar_catalogo()
-except ErroCatalogo as erro:
-    st.error(f"Não foi possível carregar o catálogo: {erro}")
-    st.stop()
-
-if not produtos:
-    st.info("O catálogo ainda não tem produtos cadastrados.")
-    st.stop()
-
-# Os controles são lidos primeiro, mas aparecem na coluna da direita.
 principal, lateral = st.columns([1.6, 1], gap="medium")
 
 with lateral.container(key="controles", border=True):
@@ -203,109 +207,119 @@ with lateral.container(key="controles", border=True):
 
     produto = st.selectbox(
         "Produto",
-        produtos,
-        format_func=lambda item: f'{item["nome"]} ({item["categoria"]})',
+        catalogo["produtos"],
+        format_func=lambda item: item["nome"],
     )
-
+    variante = st.selectbox(
+        "Variante",
+        produto["variantes"],
+        format_func=lambda item: item["nome"],
+        key=f"variante_{produto['id']}",
+    )
     quantidade = st.number_input("Quantidade", min_value=1, value=1, step=1)
-    nome_destino = st.selectbox("Destino", list(DESTINOS))
-    destino = DESTINOS[nome_destino]
 
-    preco = produto.get(CAMPO_PRECO)
-    preco_valido = isinstance(preco, (int, float)) and preco > 0
+    pais = st.selectbox("País de destino", list(rotas["destinos"]))
+    destino = rotas["destinos"][pais]
+    moeda_destino = destino["moeda"]
+    rota = f"{origem['porto']} → {destino['porto']}"
 
-    if not preco_valido:
-        st.error("Este produto não tem um preço válido cadastrado.")
+    st.caption(f"Rota marítima · {rota}")
+    st.caption(f"Moeda do destino · {moeda_destino}")
 
     calcular = st.button(
         "Calcular conversão",
         type="primary",
         width="stretch",
-        disabled=not preco_valido,
     )
 
-# Uma estimativa anterior só aparece enquanto os dados continuarem iguais.
-selecao = (produto["nome"], produto["categoria"], preco, quantidade, destino)
-if st.session_state.get("selecao_operacao") != selecao:
-    st.session_state["selecao_operacao"] = selecao
-    st.session_state.pop("estimativa", None)
+subtotal = calcular_subtotal_faixa(variante, quantidade)
 
-erro_operacao = None
+# Só a cotação é reutilizada. O subtotal acompanha a seleção atual.
+par = (moeda_base, moeda_destino)
+if st.session_state.get("par_cambio") != par:
+    st.session_state["par_cambio"] = par
+    st.session_state.pop("cambio_simulador", None)
+    st.session_state.pop("falha_cambio", None)
 
 if calcular:
-    st.session_state.pop("estimativa", None)
+    st.session_state.pop("cambio_simulador", None)
+    st.session_state.pop("falha_cambio", None)
     try:
-        cambio = consultar_cotacao(MOEDA_PRECO, destino)
-        totais = calcular_estimativa(preco, quantidade, cambio["cotacao"])
-    except ErroCambio as erro:
-        erro_operacao = f"Não foi possível consultar a cotação. {erro}"
-    except ValueError as erro:
-        erro_operacao = f"Não foi possível calcular a estimativa. {erro}"
-    else:
-        st.session_state["estimativa"] = (cambio, totais)
+        with st.spinner("Consultando a Frankfurter…"):
+            st.session_state["cambio_simulador"] = consultar_cotacao(*par)
+    except ErroCambio:
+        st.session_state["falha_cambio"] = True
 
-estimativa = st.session_state.get("estimativa")
+cambio = st.session_state.get("cambio_simulador")
 
 with principal.container(key="resumo", border=True):
     st.html('<div class="rotulo">Resumo da operação</div>')
     st.subheader(produto["nome"])
-    st.html(f'<span class="rota">{MOEDA_PRECO} → {destino}</span>')
+    st.caption(f"{variante['nome']} · {numero_br(quantidade, 0)} un.")
+    st.html(f'<span class="rota">{escape(rota)} · {escape(moeda_destino)}</span>')
     st.divider()
 
-    if estimativa:
-        cambio, totais = estimativa
-        titulo_valor = "Total convertido estimado"
-        valor = moeda(totais["total_convertido"], destino)
-        legenda = f'{nome_destino} · {numero_br(quantidade, 0)} un.'
+    if cambio:
+        faixa_destaque = converter_faixa(subtotal, cambio["cotacao"])
+        codigo_destaque = moeda_destino
     else:
-        titulo_valor = "Preço unitário de demonstração"
-        valor = moeda(preco, MOEDA_PRECO) if preco_valido else "Indisponível"
-        legenda = "Calcule a conversão para ver o total na moeda do destino."
+        faixa_destaque = subtotal
+        codigo_destaque = moeda_base
 
+    valor = mostrar_faixa(faixa_destaque, codigo_destaque)
     st.html(f"""
-    <div class="rotulo">{escape(titulo_valor)}</div>
+    <div class="rotulo">Subtotal da mercadoria em {escape(codigo_destaque)}</div>
     <div class="valor-principal">{escape(valor)}</div>
-    <div class="nota">{escape(legenda)}</div>
+    <div class="nota">Preço simulado · somente mercadoria</div>
     """)
+    mostrar_referencia(faixa_destaque, codigo_destaque)
 
-    if erro_operacao:
-        st.error(erro_operacao)
-
-    st.divider()
-    esquerda, direita = st.columns(2)
-
-    if estimativa:
-        esquerda.metric("Total original", moeda(totais["total_original"], MOEDA_PRECO))
-        direita.metric("Quantidade", f"{numero_br(quantidade, 0)} un.")
+    if cambio:
+        st.divider()
+        st.write(f"**Subtotal em reais:** {mostrar_faixa(subtotal, moeda_base)}")
+        mostrar_referencia(subtotal, moeda_base)
+    elif st.session_state.get("falha_cambio"):
+        st.warning(
+            "Cotação indisponível. Clique em Calcular conversão para tentar novamente."
+        )
     else:
-        esquerda.metric("Quantidade", f"{numero_br(quantidade, 0)} un.")
-        direita.metric("Moeda de destino", destino)
+        st.caption("Clique em Calcular conversão para consultar o câmbio.")
 
 with st.container(key="detalhes", border=True):
     st.html('<div class="rotulo">Memória da operação</div>')
-    st.subheader("Detalhes da conversão")
+    st.subheader("Detalhes da simulação")
 
     item_preco, item_cambio, item_data = st.columns(3)
 
-    item_preco.caption("Preço unitário de demonstração")
-    item_preco.write(moeda(preco, MOEDA_PRECO) if preco_valido else "Indisponível")
+    with item_preco:
+        st.caption("Preço unitário simulado")
+        st.write(mostrar_faixa(variante, moeda_base))
+        mostrar_referencia(variante, moeda_base)
+        st.caption(f"Fonte do preço: {catalogo['fonte_preco']}")
 
-    item_cambio.caption("Cotação aplicada")
-    item_data.caption("Data de referência")
+    with item_cambio:
+        st.caption("Cotação aplicada · API Frankfurter")
+        if cambio:
+            taxa = moeda(cambio["cotacao"], cambio["destino"], casas=4)
+            st.write(f"{moeda(1, cambio['origem'])} = {taxa}")
+        elif st.session_state.get("falha_cambio"):
+            st.write("Consulta indisponível")
+        else:
+            st.write("Aguardando consulta")
 
-    if estimativa:
-        cambio, _ = estimativa
-        taxa = moeda(cambio["cotacao"], cambio["destino"], casas=4)
-        item_cambio.write(f"US$ 1,00 = {taxa}")
-        item_data.write(data_cotacao(cambio))
-    else:
-        item_cambio.write("Aguardando consulta")
-        item_data.write("—")
+    with item_data:
+        st.caption("Data de referência do câmbio")
+        st.write(data_cotacao(cambio) if cambio else "—")
 
     st.divider()
-    if produto.get("preco_e_ficticio"):
-        st.caption("Preço fictício para demonstração. O valor não representa um preço oficial da WEG.")
-    st.caption("A estimativa considera apenas os produtos. Frete, impostos e taxas ficam fora do total.")
 
-    if produto.get("peso_kg") is None or produto.get("dimensoes_mm") is None:
-        st.caption("O catálogo não informa todos os dados de peso e dimensões deste produto.")
+    frete, prazo = st.columns(2)
+    frete.caption("Frete marítimo")
+    frete.write("Cotação pendente")
+    prazo.caption("Prazo entre portos")
+    prazo.write("Aguardando estimativa")
+
+    st.caption(
+        "O subtotal inclui apenas a mercadoria. Frete, seguro, impostos "
+        "e despesas portuárias estão fora do cálculo."
+    )
