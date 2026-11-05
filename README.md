@@ -8,7 +8,7 @@ Quanto custariam cinco motores brasileiros na moeda de um cliente no México? O 
 Por exemplo, **5 motores W22 de 2 CV** têm um subtotal simulado de **R$ 9.000 a R$ 13.000**. Ao selecionar o México, a rota exibida é **Santos → Manzanillo**. Um clique em **Calcular conversão** mostra quanto essa faixa representa em pesos mexicanos, junto com a taxa utilizada e sua data de referência.
 
 > **Como ler o resultado**  
-> Os preços do catálogo são estimativas educacionais. O câmbio vem da API [Frankfurter](https://frankfurter.dev/). O subtotal cobre a mercadoria. Frete, seguro, impostos e despesas portuárias ficam fora da conta.
+> Os preços do catálogo são estimativas educacionais. O câmbio vem da API [Frankfurter](https://frankfurter.dev/). O subtotal comercial cobre a mercadoria. Logística e simulação tributária possuem módulos e resumos próprios, sem garantia de custo final ao cliente.
 
 ## Como rodar no seu PC
 
@@ -157,7 +157,7 @@ com sidebar azul-marinho, cards brancos e ações azuis.
 Abra **Simulador** para o fluxo existente; as entradas estão em **Mercadoria**
 e **Trajeto e moeda**. Consulte o catálogo em **Produtos**, a base UN/LOCODE em
 **Fretes e rotas**, e as abas **Histórico** e **Relatórios** na página correspondente.
-Impostos e Precificação estão identificados como **Planejado**; Contêineres possui calculadora didática.
+Impostos possui modo manual e exercícios didáticos; Precificação permanece **Planejado**. Contêineres possui calculadora didática.
 Integrações informa o estado conhecido do câmbio e os recursos futuros.
 Seleções úteis são preservadas entre páginas; navegar não dispara consulta externa.
 
@@ -222,3 +222,24 @@ A comparação manual permanece separada e identificada. O histórico mostra as
 taxas e valores originalmente salvos, sem atualização silenciosa.
 
 Veja [contrato das taxas, fontes, arredondamento e exemplo reproduzível](docs/cambio.md).
+
+
+## Simulação tributária por cenário
+
+Abra **Operações → Impostos** e use as abas **Cenário**, **Classificação fiscal**,
+**Regras e bases** e **Resultado e memória**. Há percentuais com bases explícitas,
+valores fixos por operação e dependências entre tributos, com rejeição de ciclos.
+Origem da mercadoria é separada do embarque no Brasil. SH, NCM e código nacional
+do destino têm edição, fonte e estado próprios, sem classificação automática.
+
+A entrega inclui **modo manual e dois exercícios didáticos BR → US e BR → MX**,
+com código sintético e parâmetros matemáticos sem validade legal. **Nenhum cenário
+tributário oficial foi ativado**; faltam confirmação da classificação e verificação
+das normas aplicáveis. Câmbio aduaneiro é informado separadamente, sem equivalência
+automática com Frankfurter. Faixas abertas, estados pendentes e originais são preservados.
+
+O resumo fiscal mostra conhecidos por moeda/unidade, denominador do percentual e
+subtotal acrescido dos tributos quando completo no escopo. Leve o cenário ao
+simulador para salvar sua cópia no histórico; registros antigos não são recalculados.
+
+Consulte [fontes, cenários, fórmulas, exemplos, verificações e limitações](docs/tributos.md).

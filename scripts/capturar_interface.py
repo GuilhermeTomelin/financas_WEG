@@ -39,10 +39,10 @@ def main():
         cdp("Page.enable")
         for tamanho,largura,altura in (("desktop",1440,1050),("mobile",390,844)):
             cdp("Emulation.setDeviceMetricsOverride",dict(width=largura,height=altura,deviceScaleFactor=1,mobile=False,screenWidth=largura,screenHeight=altura))
-            for nome,caminho in (("dashboard",""),("simulador","simulador"),("produtos","produtos"),("historico","historico"),("conteineres","conteineres"),("fretes","rotas")):
+            for nome,caminho in (("dashboard",""),("simulador","simulador"),("produtos","produtos"),("historico","historico"),("conteineres","conteineres"),("fretes","rotas"),("impostos","impostos")):
                 cdp("Page.navigate",dict(url="http://127.0.0.1:8507/"+caminho))
-                titulo={"dashboard":"Dashboard","simulador":"Simulador","produtos":"Produtos","historico":"Histórico e relatórios","conteineres":"Contêineres","fretes":"Fretes e rotas"}[nome]
-                marcador={"simulador":"Mercadorias e logística por moeda","conteineres":"Resumo da carga","fretes":"Resumo logístico"}.get(nome,titulo)
+                titulo={"dashboard":"Dashboard","simulador":"Simulador","produtos":"Produtos","historico":"Histórico e relatórios","conteineres":"Contêineres","fretes":"Fretes e rotas","impostos":"Impostos"}[nome]
+                marcador={"simulador":"Mercadorias e logística por moeda","conteineres":"Resumo da carga","fretes":"Resumo logístico","impostos":"Modo tributário"}.get(nome,titulo)
                 for _ in range(150):
                     pronto=avaliar("Boolean(document.querySelector('h1')?.textContent === " + json.dumps(titulo) + " && document.body.innerText.includes(" + json.dumps(marcador) + ") && document.querySelectorAll('[data-testid=stSkeleton]').length === 0)")
                     if pronto:
@@ -71,6 +71,18 @@ def main():
                 arquivo.write_bytes(base64.b64decode(captura["data"]))
                 relatorio.append(dict(pagina=nome,tamanho=tamanho,arquivo=arquivo.name,**resumo))
                 print(nome,tamanho,resumo)
+                if nome == "impostos":
+                    avaliar("[...document.querySelectorAll('[role=tab]')].find(e=>e.textContent.includes('Resultado e memória')).click()")
+                    time.sleep(.5)
+                    avaliar("[...document.querySelectorAll('h2,h3')].find(e=>e.textContent==='Simulação tributária').scrollIntoView({block:'start'})")
+                    time.sleep(.3)
+                    detalhes=avaliar("JSON.stringify({erro:document.querySelector('[data-testid=stException]')?.textContent || null,scroll:document.documentElement.scrollWidth})")
+                    detalhes=json.loads(detalhes)
+                    if detalhes['erro'] or detalhes['scroll']>largura:
+                        raise RuntimeError(detalhes)
+                    captura_fiscal=cdp("Page.captureScreenshot",dict(format="png",captureBeyondViewport=False))
+                    (destino/f"impostos-resultado-{tamanho}.png").write_bytes(base64.b64decode(captura_fiscal["data"]))
+                    relatorio.append(dict(pagina="impostos-resultado",tamanho=tamanho,arquivo=f"impostos-resultado-{tamanho}.png",**detalhes,largura=largura))
                 if nome == "simulador":
                     avaliar("[...document.querySelectorAll('h2,h3')].find(e=>e.textContent==='Mercadorias e logística por moeda').scrollIntoView({block:'start'})")
                     time.sleep(.3)

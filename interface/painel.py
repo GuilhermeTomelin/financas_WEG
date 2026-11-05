@@ -174,8 +174,8 @@ def conteineres():
 
 
 def impostos():
-    cabecalho("Impostos", "Visão tributária das operações internacionais.", "OPERAÇÕES")
-    estado("Tributação da operação", "Organizar os tributos aplicáveis conforme origem, destino e características da mercadoria. Alíquotas e fórmulas ainda não foram implementadas.", planejado=True)
+    from interface.impostos import exibir
+    exibir()
 
 
 def precificacao():

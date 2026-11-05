@@ -12,7 +12,7 @@ mantém suas dependências existentes. Não foi feita migração de frontend.
 | Operações | Simulador | Fluxo existente: catálogo, variantes, quantidade, portos, câmbio, comparação manual e salvamento |
 | Operações | Contêineres | Calculadora operacional: grade uniforme, peso, volume, ocupação, quantidade automática/manual e comparação dos três equipamentos |
 | Operações | Fretes e rotas | Simulação editável de frete/despesas e aba de consulta UN/LOCODE |
-| Operações | Impostos | Planejado: recursos tributários ainda não implementados |
+| Operações | Impostos | Cenário, classificação, regras editáveis e memória: modo manual e dois exercícios didáticos; sem cenário legal ativado |
 | Operações | Precificação | Planejado: análise futura de custo, margem e preço |
 | Dados e análises | Produtos | Busca e filtro de catálogo, abas Comercial e Logística, sem editor |
 | Dados e análises | Histórico e relatórios | Filtros compartilhados e abas Histórico e Relatórios, sem inventar atividade |
@@ -72,7 +72,7 @@ preservação de estado, filtros, histórico legado e telas vazias/preenchidas.
 Os registros preenchidos dos testes são fixtures, não dados de demonstração
 inseridos no banco do usuário.
 
-A pasta `docs/capturas/` contém dashboard, simulador, produtos, histórico, contêineres e fretes em
+A pasta `docs/capturas/` contém dashboard, simulador, produtos, histórico, contêineres, fretes e impostos em
 **1440 × 1050** e **390 × 844**, capturados no Chrome headless. O relatório
 `verificacao.json` registra títulos, cores de fundo e ausência de exceções e
 rolagem horizontal da página nesses viewports. São capturas da área visível,
@@ -82,8 +82,7 @@ O script `scripts/capturar_interface.py` reproduz a captura com Streamlit em
 para executar o produto nem adiciona dependências à aplicação.
 
 Limites: revisão visual local em Chrome, sem matriz de navegadores ou auditoria
-com leitor de tela. Impostos e Precificação continuam planejados. A calculadora de Contêineres está operacional para estimativas didáticas; consulte `docs/conteineres.md`. Não há tarifas ou
-tributos novos. Os controles operacionais continuam sendo os do Streamlit,
+com leitor de tela. Precificação continua planejada. Impostos tem modo manual e exemplos didáticos; consulte `docs/tributos.md`. A calculadora de Contêineres está operacional para estimativas didáticas; consulte `docs/conteineres.md`. As tarifas e regras tributárias pré-carregadas são didáticas, sem validade comercial ou legal. Os controles operacionais continuam sendo os do Streamlit,
 com adaptação das referências, sem copiar seus elementos publicitários.
 
 Detalhes da calculadora: [fontes, fórmulas, premissas e limitações](conteineres.md).
@@ -91,3 +90,5 @@ Detalhes da calculadora: [fontes, fórmulas, premissas e limitações](conteiner
 Frete e despesas: [guia de modelos, moedas, edição e histórico](fretes.md).
 
 Conversão compartilhada: [duas moedas, taxas, datas e histórico](cambio.md).
+
+Detalhes da simulação tributária e sua integração ao histórico: [tributos.md](tributos.md).

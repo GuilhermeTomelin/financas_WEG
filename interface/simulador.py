@@ -15,6 +15,8 @@ from consumo.conteineres import carregar_conteineres
 from consumo.fretes import carregar_fretes, buscar_tarifa
 from calculos.fretes import cenario_compativel, serializar, assinatura_contexto
 from calculos.consolidacao import consolidar_operacao
+from calculos.tributos import aplicar_snapshot_tributario
+from interface.resumo_tributario import exibir_resumo_tributario
 from calculos.cambio import ConjuntoCotacoes
 from calculos.monetario import decimal
 from interface.conversao import exibir_consolidacao
@@ -135,9 +137,16 @@ def exibir():
         if antiga:
             logistica=cenario_compativel(ativa,produto["id"],variante,quantidade,origem_codigo,destino_codigo,tipo_conteiner,antiga)
     cotacoes=obter_cache_sessao(st.session_state)
+    contexto_fiscal=dict(produto_id=produto["id"],variante=variante,quantidade=quantidade,
+                         origem_unlocode=origem_codigo,destino_unlocode=destino_codigo,conteiner_id=tipo_conteiner)
     def calcular_conjunto(taxas):
-        return consolidar_operacao(variante,quantidade,moeda_base,moeda_destino,taxas,
-                                    logistica=logistica["entradas"] if logistica else None)
+        base=consolidar_operacao(variante,quantidade,moeda_base,moeda_destino,taxas,
+                                logistica=logistica["entradas"] if logistica else None)
+        fiscal=aplicar_snapshot_tributario(st.session_state.get("tributos_ativos"),contexto_fiscal,base,taxas)
+        if fiscal:
+            base["pares_faltantes"]=[list(p) for p in sorted({tuple(p) for p in base["pares_faltantes"]+fiscal["resultado"]["pares_faltantes"]})]
+        base["tributacao"]=fiscal
+        return base
     consolidacao=calcular_conjunto(list(cotacoes.values()))
     if calcular:
         with st.spinner("Consultando a Frankfurter…"):
@@ -149,6 +158,9 @@ def exibir():
                     st.warning(erro)
             else:
                 st.session_state.pop("falha_cambio",None)
+    tributacao=consolidacao.get("tributacao")
+    if tributacao:
+        st.session_state["tributos_ativos"]=tributacao
     cambio=consolidacao["itens"][0]["taxas"][moeda_destino]
     if calcular:
         if cambio:
@@ -209,6 +221,14 @@ def exibir():
             st.info("Nenhum cenário logístico compatível com produto, lote, portos, equipamento e moeda atuais. Configure-o em Fretes e rotas.")
         st.page_link("paginas/rotas.py", label="Configurar frete e despesas", icon=":material/route:")
 
+    with st.container(border=True,key="card_fiscal_simulador"):
+        if tributacao:
+            exibir_resumo_tributario(tributacao,compacto=True)
+        else:
+            st.subheader("Simulação tributária")
+            st.info("Nenhum cenário tributário compatível com as entradas atuais. Configure ou revise os impostos; ausência de regra não significa imposto zero.")
+        st.page_link("paginas/impostos.py",label="Configurar cenário tributário",icon=":material/account_balance:")
+
     with principal:
         comparacao = None
         valido = bool(cambio)
@@ -237,7 +257,7 @@ def exibir():
                         destino=destino, moeda=moeda_destino, moeda_base=moeda_base, unitario=variante,
                         subtotal=subtotal, convertido=faixa_destaque, cambio=cambio, fonte_cambio=cambio.get("provedor") if cambio else None,
                         tipo_preco="simulado", fonte_preco=catalogo["fonte_preco"], comparacao=comparacao,
-                        tipo_conteiner=tipo_conteiner, logistica=logistica, consolidacao=consolidacao)
+                        tipo_conteiner=tipo_conteiner, logistica=logistica, consolidacao=consolidacao, tributacao=tributacao)
         operacao=serializar(operacao)
         if calcular or operacao != st.session_state.get("fotografia"):
             st.session_state.fotografia = operacao
@@ -298,7 +318,7 @@ def exibir():
 
         st.caption(
             "O subtotal da mercadoria e as despesas logísticas são apresentados separadamente. "
-            "Impostos ainda não estão implementados; os valores não são um custo completo ao cliente."
+            "Tributos compatíveis aparecem no resumo fiscal. Os valores representam o escopo configurado, sem garantia de custo final ao cliente."
         )
 
 

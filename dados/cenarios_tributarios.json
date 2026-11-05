@@ -1,0 +1,218 @@
+{
+  "versao_esquema": 1,
+  "descricao": "Exercícios completos, sem regras legais ativadas. Código 000001 é sintético, não uma classificação real.",
+  "fontes_classificacao": [
+    {
+      "url": "https://www.gov.br/siscomex/pt-br/servicos/aprendendo-a-exportar/1-classificacao-fiscal-da-mercadoria/sh-e-ncm/sh-e-ncm",
+      "consultado_em": "2026-11-05",
+      "escopo": "Apenas distinção estrutural SH/NCM; não fundamenta tributos dos exercícios."
+    },
+    {
+      "url": "https://www.wcoomd.org/en/faq/harmonized_system_faq",
+      "consultado_em": "2026-11-05",
+      "escopo": "Estrutura de seis dígitos e edição HS 2022; não confirma classificação de produto."
+    }
+  ],
+  "cenarios": [
+    {
+      "versao": "1.0",
+      "estado": "exemplo_didatico",
+      "revisao_especialista": "nao_revisada",
+      "pais_origem": "BR",
+      "pais_procedencia": "BR",
+      "pais_destino": "US",
+      "inicio_vigencia": "2026-01-01",
+      "fim_vigencia": "2026-12-31",
+      "classificacao": {
+        "sistema": "HS_SH",
+        "versao": "2022",
+        "codigo": "000001",
+        "pais": null,
+        "codigo_sintetico": true
+      },
+      "condicoes": {
+        "regime": "EXERCICIO_SEM_PREFERENCIA",
+        "mercadoria_nova": true
+      },
+      "fonte": null,
+      "consultado_em": null,
+      "premissas": "Exercício matemático em BRL. Não representa a legislação, moeda tributária ou classificação real de nenhum país.",
+      "excecoes": "Não trata benefícios, créditos, acordos, impostos reais ou cálculo por dentro.",
+      "verificacao_documental": null,
+      "id": "exercicio_dependencias",
+      "nome": "Exercício BR → US: percentuais em sequência e valor fixo",
+      "regras": [
+        {
+          "id": "did_a",
+          "versao": "1.0",
+          "nome": "Tributo didático A",
+          "jurisdicao": "US",
+          "escopo": "importacao_destino",
+          "tipo_calculo": "percentual",
+          "aliquota": 5,
+          "valor_fixo": null,
+          "moeda": "BRL",
+          "componentes_base": [
+            "mercadoria"
+          ],
+          "situacao": "aplicavel",
+          "participa_total": true,
+          "incluido_em": null,
+          "inicio_vigencia": "2026-01-01",
+          "fim_vigencia": "2026-12-31",
+          "estado_regra": "exemplo_didatico",
+          "revisao_especialista": "nao_revisada",
+          "fonte": null,
+          "consultado_em": null,
+          "fundamentacao": null,
+          "cambio_base": "referencia",
+          "arredondamento": "politica_monetaria",
+          "observacoes": "Parâmetros inventados exclusivamente para exercício; não são tributos ou vigências legais desse país."
+        },
+        {
+          "id": "did_b",
+          "versao": "1.0",
+          "nome": "Tributo didático B",
+          "jurisdicao": "US",
+          "escopo": "importacao_destino",
+          "tipo_calculo": "percentual",
+          "aliquota": 10,
+          "valor_fixo": null,
+          "moeda": "BRL",
+          "componentes_base": [
+            "mercadoria",
+            "tributo:did_a"
+          ],
+          "situacao": "aplicavel",
+          "participa_total": true,
+          "incluido_em": null,
+          "inicio_vigencia": "2026-01-01",
+          "fim_vigencia": "2026-12-31",
+          "estado_regra": "exemplo_didatico",
+          "revisao_especialista": "nao_revisada",
+          "fonte": null,
+          "consultado_em": null,
+          "fundamentacao": null,
+          "cambio_base": "referencia",
+          "arredondamento": "politica_monetaria",
+          "observacoes": "Parâmetros inventados exclusivamente para exercício; não são tributos ou vigências legais desse país."
+        },
+        {
+          "id": "did_fixo",
+          "versao": "1.0",
+          "nome": "Encargo didático fixo",
+          "jurisdicao": "US",
+          "escopo": "importacao_destino",
+          "tipo_calculo": "fixo",
+          "aliquota": null,
+          "valor_fixo": 2.5,
+          "moeda": "BRL",
+          "componentes_base": [],
+          "situacao": "aplicavel",
+          "participa_total": true,
+          "incluido_em": null,
+          "inicio_vigencia": "2026-01-01",
+          "fim_vigencia": "2026-12-31",
+          "estado_regra": "exemplo_didatico",
+          "revisao_especialista": "nao_revisada",
+          "fonte": null,
+          "consultado_em": null,
+          "fundamentacao": null,
+          "cambio_base": "referencia",
+          "arredondamento": "politica_monetaria",
+          "observacoes": "Parâmetros inventados exclusivamente para exercício; não são tributos ou vigências legais desse país."
+        }
+      ]
+    },
+    {
+      "versao": "1.0",
+      "estado": "exemplo_didatico",
+      "revisao_especialista": "nao_revisada",
+      "pais_origem": "BR",
+      "pais_procedencia": "BR",
+      "pais_destino": "MX",
+      "inicio_vigencia": "2026-01-01",
+      "fim_vigencia": "2026-12-31",
+      "classificacao": {
+        "sistema": "HS_SH",
+        "versao": "2022",
+        "codigo": "000001",
+        "pais": null,
+        "codigo_sintetico": true
+      },
+      "condicoes": {
+        "regime": "EXERCICIO_SEM_PREFERENCIA",
+        "mercadoria_nova": true
+      },
+      "fonte": null,
+      "consultado_em": null,
+      "premissas": "Exercício matemático em BRL. Não representa a legislação, moeda tributária ou classificação real de nenhum país.",
+      "excecoes": "Não trata benefícios, créditos, acordos, impostos reais ou cálculo por dentro.",
+      "verificacao_documental": null,
+      "id": "exercicio_aduaneiro",
+      "nome": "Exercício BR → MX: hipótese aduaneira e alíquota zero",
+      "regras": [
+        {
+          "id": "did_adu",
+          "versao": "1.0",
+          "nome": "Tributo didático sobre hipótese aduaneira",
+          "jurisdicao": "MX",
+          "escopo": "importacao_destino",
+          "tipo_calculo": "percentual",
+          "aliquota": 12,
+          "valor_fixo": null,
+          "moeda": "BRL",
+          "componentes_base": [
+            "valor_aduaneiro"
+          ],
+          "situacao": "aplicavel",
+          "participa_total": true,
+          "incluido_em": null,
+          "inicio_vigencia": "2026-01-01",
+          "fim_vigencia": "2026-12-31",
+          "estado_regra": "exemplo_didatico",
+          "revisao_especialista": "nao_revisada",
+          "fonte": null,
+          "consultado_em": null,
+          "fundamentacao": null,
+          "cambio_base": "referencia",
+          "arredondamento": "politica_monetaria",
+          "observacoes": "Parâmetros inventados exclusivamente para exercício; não são tributos ou vigências legais desse país."
+        },
+        {
+          "id": "did_zero",
+          "versao": "1.0",
+          "nome": "Alíquota didática zero (não é isenção)",
+          "jurisdicao": "MX",
+          "escopo": "importacao_destino",
+          "tipo_calculo": "percentual",
+          "aliquota": 0,
+          "valor_fixo": null,
+          "moeda": "BRL",
+          "componentes_base": [
+            "mercadoria"
+          ],
+          "situacao": "aplicavel",
+          "participa_total": true,
+          "incluido_em": null,
+          "inicio_vigencia": "2026-01-01",
+          "fim_vigencia": "2026-12-31",
+          "estado_regra": "exemplo_didatico",
+          "revisao_especialista": "nao_revisada",
+          "fonte": null,
+          "consultado_em": null,
+          "fundamentacao": null,
+          "cambio_base": "referencia",
+          "arredondamento": "politica_monetaria",
+          "observacoes": "Parâmetros inventados exclusivamente para exercício; não são tributos ou vigências legais desse país."
+        }
+      ],
+      "valor_aduaneiro_exemplo": {
+        "valor": 100,
+        "moeda": "BRL",
+        "fonte": "Hipótese aduaneira fictícia do exercício; não determinada pela legislação",
+        "origem": "exemplo_didatico"
+      }
+    }
+  ]
+}

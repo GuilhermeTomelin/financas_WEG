@@ -48,6 +48,12 @@ def exibir(moeda, faixa, numero, registros):
                 from interface.resumo_logistico import exibir_resumo
                 st.caption("Fotografia logística salva; não é recalculada com tarifas atuais.")
                 exibir_resumo(registro["logistica"]["resultado"], compacto=True)
+            if registro.get("tributacao"):
+                from interface.resumo_tributario import exibir_resumo_tributario
+                st.caption("Fotografia tributária salva, com regras, versões e taxas originais; sem recálculo com a configuração atual.")
+                exibir_resumo_tributario(registro["tributacao"],compacto=True)
+            else:
+                st.caption("Tributação não registrada nesta simulação; não significa imposto zero. Registros anteriores permanecem como foram salvos.")
             st.json({k:v for k,v in registro.items() if k != "local"})
     with aba_relatorios:
         df = pd.DataFrame([{"País": r["pais"], "Produto": r["produto"], "Unidades": r["quantidade"],
