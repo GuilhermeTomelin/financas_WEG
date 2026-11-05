@@ -1,0 +1,70 @@
+{
+  "conteineres": [
+    {
+      "id": "dry20",
+      "nome": "Dry de 20 pés",
+      "dimensoes_internas_cm": {
+        "comprimento": 590,
+        "largura": 235.2,
+        "altura": 239.5
+      },
+      "porta_cm": {
+        "largura": 234,
+        "altura": 229.2
+      },
+      "tara_kg": 2350,
+      "peso_bruto_maximo_kg": 30480,
+      "carga_util_kg": 28130,
+      "natureza": "referencia_publicada",
+      "fonte": "Hapag-Lloyd · exemplo de equipamento da frota",
+      "url": "https://www.hapag-lloyd.com/en/services-information/cargo-fleet/container/20-standard.html",
+      "consultado_em": "2026-11-05",
+      "referencia": "Tabelas Inside Dimension, Door Opening e Weight da página do equipamento. Dimensões em mm convertidas para cm.",
+      "observacao": "As especificações variam conforme fabricante e equipamento. Conferir o contêiner efetivo antes de uso operacional."
+    },
+    {
+      "id": "dry40",
+      "nome": "Dry de 40 pés",
+      "dimensoes_internas_cm": {
+        "comprimento": 1203.2,
+        "largura": 235.2,
+        "altura": 239.5
+      },
+      "porta_cm": {
+        "largura": 234,
+        "altura": 229.2
+      },
+      "tara_kg": 3750,
+      "peso_bruto_maximo_kg": 32500,
+      "carga_util_kg": 28750,
+      "natureza": "referencia_publicada",
+      "fonte": "Hapag-Lloyd · exemplo de equipamento da frota",
+      "url": "https://www.hapag-lloyd.com/en/services-information/cargo-fleet/container/40-standard.html",
+      "consultado_em": "2026-11-05",
+      "referencia": "Tabelas Inside Dimension, Door Opening e Weight da página do equipamento. Dimensões em mm convertidas para cm.",
+      "observacao": "As especificações variam conforme fabricante e equipamento. Conferir o contêiner efetivo antes de uso operacional."
+    },
+    {
+      "id": "hc40",
+      "nome": "Dry de 40 pés High Cube",
+      "dimensoes_internas_cm": {
+        "comprimento": 1203.2,
+        "largura": 235,
+        "altura": 270
+      },
+      "porta_cm": {
+        "largura": 234,
+        "altura": 259.7
+      },
+      "tara_kg": 3900,
+      "peso_bruto_maximo_kg": 32500,
+      "carga_util_kg": 28600,
+      "natureza": "referencia_publicada",
+      "fonte": "Hapag-Lloyd · exemplo de equipamento da frota",
+      "url": "https://www.hapag-lloyd.com/en/services-information/cargo-fleet/container/40-standard-high-cube.html",
+      "consultado_em": "2026-11-05",
+      "referencia": "Tabelas Inside Dimension, Door Opening e Weight da página do equipamento. Dimensões em mm convertidas para cm.",
+      "observacao": "As especificações variam conforme fabricante e equipamento. Conferir o contêiner efetivo antes de uso operacional."
+    }
+  ]
+}
