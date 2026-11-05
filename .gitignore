@@ -16,3 +16,5 @@ __pycache__/
 .vscode/
 
 /dados/simulacoes.sqlite3*
+# Arquivo oficial bruto; a cópia processada é versionável.
+dados/fontes/
