@@ -1,0 +1,65 @@
+{
+  "fonte_moedas": "Configuração herdada de dados/rotas.json; UN/LOCODE não fornece moedas. Outros países ficam sem moeda local configurada.",
+  "origem_padrao": "BRSSZ",
+  "destino_padrao": "ITGIT",
+  "paises": {
+    "BR": {
+      "nome": "Brasil",
+      "moeda": "BRL",
+      "porto_padrao": "BRSSZ"
+    },
+    "IT": {
+      "nome": "Itália",
+      "moeda": "EUR",
+      "porto_padrao": "ITGIT"
+    },
+    "US": {
+      "nome": "Estados Unidos",
+      "moeda": "USD",
+      "porto_padrao": "USLAX"
+    },
+    "DE": {
+      "nome": "Alemanha",
+      "moeda": "EUR",
+      "porto_padrao": "DEHAM"
+    },
+    "MX": {
+      "nome": "México",
+      "moeda": "MXN",
+      "porto_padrao": "MXZLO"
+    },
+    "CL": {
+      "nome": "Chile",
+      "moeda": "CLP",
+      "porto_padrao": "CLSAI"
+    },
+    "ZA": {
+      "nome": "África do Sul",
+      "moeda": "ZAR",
+      "porto_padrao": "ZADUR"
+    }
+  },
+  "favoritos": [
+    "BRSSZ",
+    "ITGIT",
+    "USLAX",
+    "DEHAM",
+    "MXZLO",
+    "CLSAI",
+    "ZADUR"
+  ],
+  "rotas": [],
+  "legado": "dados/rotas.json preservado integralmente. Não havia frete, prazo ou serviço confirmado. Os portos padrão foram conferidos na publicação 2025-1; não são rotas comerciais confirmadas.",
+  "verificacao_cambio": {
+    "data": "2026-11-05",
+    "fonte": "https://api.frankfurter.dev/v2/currencies",
+    "pares_consultados": [
+      "BRL/EUR",
+      "BRL/USD",
+      "BRL/MXN",
+      "BRL/CLP",
+      "BRL/ZAR"
+    ],
+    "observacao": "Pares responderam à consulta real nesta data; disponibilidade e taxas dependem da API no momento da operação. BRL/BRL usa identidade local."
+  }
+}

@@ -1,0 +1,47 @@
+/* Tema e acabamento centralizados. Classes st-key são definidas pelo projeto. */
+:root { --ink: #172B4D; --muted: #58687f; --line: #E5EAF2; --blue: #3B63F6; }
+.block-container { max-width: 1500px; padding: 4.3rem clamp(1rem,3vw,3rem) 3rem; }
+[data-testid="stAppViewContainer"] { background: #F5F7FB; }
+[data-testid="stHeader"] { background: #F5F7FBee; }
+h1 { font-size: clamp(1.8rem,3vw,2.3rem); font-weight: 750; letter-spacing: -.035em; }
+h2 { font-size: 1.35rem; letter-spacing: -.02em; }
+h3 { font-size: 1.1rem; } h4 { font-size: 1rem; }
+p, label { overflow-wrap: anywhere; }
+.rotulo { font-size: .68rem; letter-spacing: .13em; font-weight: 700; color: #58687f; margin: .2rem 0 .55rem; }
+[data-testid="stCaptionContainer"] { color: #58687f; }
+[data-testid="stMetric"] { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 1.15rem; box-shadow: 0 3px 14px #172b4d05; }
+[data-testid="stMetricValue"] { font-weight: 750; font-size: clamp(1.6rem,2.5vw,2.1rem); color: var(--ink); }
+[class*="st-key-card_"], .st-key-controles, .st-key-resumo, .st-key-detalhes {
+    background: white; border-radius: 14px; padding: clamp(1rem,2vw,1.5rem); box-shadow: 0 3px 18px #172b4d05;
+}
+[data-testid="stSidebar"] { background: #101C44; border-right: 1px solid #24315b; }
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: #BDC9E8; }
+[data-testid="stSidebarNavLink"] { border-radius: 8px; min-height: 2.55rem; margin: .12rem 0; }
+[data-testid="stSidebarNavLink"][aria-current="page"] { background: #3B63F6; color: white; }
+.brand { display:flex; align-items:center; gap:.7rem; margin: .4rem 0 1.3rem; color:white; }
+.brand-mark { display:grid; place-items:center; width:38px; height:38px; border-radius:11px; background:#3B63F6; font-weight:800; font-size:1.15rem; }
+.brand-name { font-size:1.15rem; font-weight:750; letter-spacing:-.02em; }
+.brand-caption { font-size:.7rem; color:#BDC9E8; margin-top:.1rem; }
+button[kind="primary"] { background: #3B63F6; border-color: #3B63F6; font-weight: 650; box-shadow: 0 4px 12px #3b63f61a; }
+button[kind="primary"]:hover { background:#2c4dd0; border-color:#2c4dd0; }
+a:focus-visible, button:focus-visible, input:focus-visible, [role="combobox"]:focus-visible { outline: 3px solid #7C3AED !important; outline-offset: 3px; }
+.rota { display:inline-block; background:#EEF2FF; color:#304fae; border:1px solid #dce4ff; border-radius:7px; padding:.45rem .65rem; font-size:.8rem; line-height:1.5; overflow-wrap:anywhere; }
+.extremos { display:flex; flex-wrap:wrap; gap:1rem 2rem; margin:1rem 0; }
+.extremos div { max-width:100%; }
+.extremos small { display:block; color:#58687f; margin-bottom:.35rem; }
+.extremos strong { font-size:clamp(1.5rem,2.4vw,2.6rem); color:#172B4D; font-weight:750; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+[data-testid="stExpander"] { background:white; border-radius:12px; }
+[data-testid="stTabs"] { margin-top:.6rem; }
+@media(max-width:700px) {
+    .block-container { padding: 4.5rem 1rem 2rem; }
+    [data-testid="stHorizontalBlock"] { flex-direction:column; }
+    [data-testid="stColumn"] { width:100% !important; flex:1 1 100% !important; min-width:0 !important; }
+    .extremos { flex-direction:column; gap:.7rem; }
+}
+
+.preco-catalogo { font-size:clamp(1.35rem,2.5vw,2.15rem); font-weight:750; color:#172B4D; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; line-height:1.4; }
+[data-testid="stMetricLabel"] p { white-space:normal; overflow:visible; text-overflow:clip; }
+
+/* O texto interno da legenda possui cor própria no tema nativo. */
+[data-testid="stCaptionContainer"] p { color:#58687f; }
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color:#BDC9E8; }

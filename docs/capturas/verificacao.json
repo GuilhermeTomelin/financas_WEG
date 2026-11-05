@@ -1,0 +1,122 @@
+[
+  {
+    "pagina": "dashboard",
+    "tamanho": "desktop",
+    "arquivo": "dashboard-desktop.png",
+    "titulo": "Dashboard",
+    "largura": 1440,
+    "scroll": 1440,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "simulador",
+    "tamanho": "desktop",
+    "arquivo": "simulador-desktop.png",
+    "titulo": "Simulador",
+    "largura": 1440,
+    "scroll": 1440,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "produtos",
+    "tamanho": "desktop",
+    "arquivo": "produtos-desktop.png",
+    "titulo": "Produtos",
+    "largura": 1440,
+    "scroll": 1440,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "historico",
+    "tamanho": "desktop",
+    "arquivo": "historico-desktop.png",
+    "titulo": "Histórico e relatórios",
+    "largura": 1440,
+    "scroll": 1440,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "conteineres",
+    "tamanho": "desktop",
+    "arquivo": "conteineres-desktop.png",
+    "titulo": "Contêineres",
+    "largura": 1440,
+    "scroll": 1440,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "dashboard",
+    "tamanho": "mobile",
+    "arquivo": "dashboard-mobile.png",
+    "titulo": "Dashboard",
+    "largura": 390,
+    "scroll": 390,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "simulador",
+    "tamanho": "mobile",
+    "arquivo": "simulador-mobile.png",
+    "titulo": "Simulador",
+    "largura": 390,
+    "scroll": 390,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "produtos",
+    "tamanho": "mobile",
+    "arquivo": "produtos-mobile.png",
+    "titulo": "Produtos",
+    "largura": 390,
+    "scroll": 390,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "historico",
+    "tamanho": "mobile",
+    "arquivo": "historico-mobile.png",
+    "titulo": "Histórico e relatórios",
+    "largura": 390,
+    "scroll": 390,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "conteineres",
+    "tamanho": "mobile",
+    "arquivo": "conteineres-mobile.png",
+    "titulo": "Contêineres",
+    "largura": 390,
+    "scroll": 390,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  }
+]
