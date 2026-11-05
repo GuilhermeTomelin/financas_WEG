@@ -89,3 +89,5 @@ com adaptação das referências, sem copiar seus elementos publicitários.
 Detalhes da calculadora: [fontes, fórmulas, premissas e limitações](conteineres.md).
 
 Frete e despesas: [guia de modelos, moedas, edição e histórico](fretes.md).
+
+Conversão compartilhada: [duas moedas, taxas, datas e histórico](cambio.md).

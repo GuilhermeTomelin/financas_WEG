@@ -1,5 +1,6 @@
 """Apresentação compartilhada; cálculos e validações permanecem na camada original."""
 from datetime import date
+from decimal import Decimal
 from html import escape
 import streamlit as st
 from consumo.logistica import validar_variante
@@ -9,12 +10,14 @@ SEPARADORES_BR = str.maketrans(",.", ".,")
 
 
 def numero_br(valor, casas=2):
+    if isinstance(valor, str):
+        valor = Decimal(valor)
     return f"{valor:,.{casas}f}".translate(SEPARADORES_BR)
 
 
 def moeda(valor, codigo, casas=2):
     simbolo = SIMBOLOS.get(codigo, codigo)
-    return f"{simbolo} {numero_br(valor, casas)}"
+    return f"{codigo} {numero_br(valor, casas)}"
 
 
 def mostrar_faixa(faixa, codigo):

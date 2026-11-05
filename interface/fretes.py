@@ -7,10 +7,12 @@ from consumo.catalogo import carregar_dados_simulador, ErroCatalogo
 from consumo.portos import carregar_portos, nome_pais, buscar_portos, rotulo_porto, garantir_selecao, dados_localidade
 from consumo.conteineres import carregar_conteineres
 from consumo.fretes import carregar_fretes, buscar_tarifa, despesas_da_rota
-from consumo.cambio import MOEDAS_SUPORTADAS, consultar_cotacao, ErroCambio
+from consumo.cambio import MOEDAS_SUPORTADAS, consultar_cotacao, ErroCambio, atualizar_cotacoes, obter_cache_sessao
 from calculos.operacoes import calcular_subtotal_faixa
 from calculos.fretes import calcular_logistica, assinatura_contexto, serializar
 from interface.componentes import cabecalho, numero_br
+from calculos.consolidacao import consolidar_operacao
+from interface.conversao import exibir_consolidacao
 from interface.resumo_logistico import exibir_resumo, ESTADOS, BASES
 
 
@@ -226,40 +228,31 @@ def exibir_simulacao():
                 declaracao=dict(valor=dict(minimo=minimo,maximo=maximo,referencia_superior=None),moeda=de,origem_escolha='Valor declarado informado explicitamente pelo usuário.')
         st.caption('Seguro fixo: escolha Por operação. Seguro percentual: escolha os componentes da base. O percentual simulado não é regra universal de contratação e o próprio seguro nunca pode integrar sua base.')
     locais=dict(terrestre_origem=st.session_state.get('frete_local_coleta',''),terrestre_destino=st.session_state.get('frete_local_entrega',''))
-    cotacoes=st.session_state.setdefault('frete_cotacoes',{})
-    def calcular():
-        return calcular_logistica(variante,quantidade,equipamentos[tipo],origem,destino,apresentacao,itens,
-                                  declaracao=declaracao,cotacoes=list(cotacoes.values()),quantidade_manual=manual,tarifa=tarifa,locais=locais)
+    cotacoes=obter_cache_sessao(st.session_state)
+    entrada=dict(produto_id=id_,variante=deepcopy(variante),quantidade=quantidade,origem=origem,destino=destino,
+                 conteiner=deepcopy(equipamentos[tipo]),moeda=apresentacao,despesas=deepcopy(itens),declaracao=declaracao,
+                 quantidade_manual=manual,tarifa=deepcopy(tarifa),locais=locais)
+    def calcular(taxas):
+        return consolidar_operacao(variante,quantidade,catalogo['moeda'],apresentacao,taxas,logistica=entrada)
     try:
-        resultado=calcular()
+        consolidacao=calcular(list(cotacoes.values()))
     except ValueError as erro:
         st.error('Não foi possível calcular as despesas: '+str(erro))
         return
     if st.button('Consultar / atualizar câmbio desta simulação',key='consultar_cambio_frete'):
-        pares={tuple(p) for p in resultado['pares_faltantes']} | {(q['origem'],q['destino']) for q in resultado['cotacoes_usadas'] if q['origem']!=q['destino']}
-        tentados=set()
-        with st.spinner('Consultando a Frankfurter para os pares necessários…'):
-            while pares-tentados:
-                for de,para in sorted(pares-tentados):
-                    tentados.add((de,para))
-                    chave=de+'_'+para
-                    cotacoes.pop(chave,None)
-                    try:
-                        q=consultar_cotacao(de,para)
-                        cotacoes[chave]=dict(q,fonte='Frankfurter')
-                    except ErroCambio as erro:
-                        st.warning(f'{de} → {para}: {erro}')
-                resultado=calcular()
-                # Uma base percentual convertida pode revelar outro par necessário.
-                pares |= {tuple(p) for p in resultado['pares_faltantes']}
+        with st.spinner('Consultando um conjunto coerente de referências Frankfurter…'):
+            cotacoes,consolidacao,erros=atualizar_cotacoes(calcular,consultar_cotacao)
+            st.session_state['cotacoes_sessao']=cotacoes
+            for erro in erros:
+                st.warning(erro)
+    resultado=consolidacao['resultado_logistica']
+    exibir_consolidacao(consolidacao)
     with st.container(border=True,key='card_frete_resultado'):
         st.subheader('Resumo logístico')
         exibir_resumo(resultado)
-    entrada=dict(produto_id=id_,variante=deepcopy(variante),quantidade=quantidade,origem=origem,destino=destino,
-                 conteiner=deepcopy(equipamentos[tipo]),moeda=apresentacao,despesas=deepcopy(itens),declaracao=declaracao,
-                 quantidade_manual=manual,cotacoes=list(cotacoes.values()),tarifa=deepcopy(tarifa),locais=locais)
+    entrada['cotacoes']=list(cotacoes.values())
     st.session_state['logistica_ativa']=dict(assinatura=assinatura_contexto(id_,variante,quantidade,origem,destino,tipo,apresentacao),
-                                           entradas=serializar(entrada),resultado=serializar(resultado))
+                                           entradas=serializar(entrada),resultado=serializar(resultado),consolidacao=serializar(consolidacao))
     def levar_ao_simulador():
         st.session_state['entrada_produto']=produtos[id_]
         st.session_state['variante_'+id_]=variante

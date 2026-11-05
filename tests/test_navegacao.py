@@ -40,7 +40,8 @@ class NavegacaoTests(unittest.TestCase):
         self.assertFalse(app.exception)
         self.assertEqual(app.number_input(key="entrada_qtd").value,7)
         self.assertEqual(app.selectbox(key="entrada_destino_iso").value,"MX")
-        self.assertEqual(app.session_state["cambio_simulador"],cotacao)
+        self.assertEqual(float(app.session_state["cambio_simulador"]["cotacao"]),cotacao["cotacao"])
+        self.assertEqual(app.session_state["cambio_simulador"]["data_referencia"],cotacao["data_referencia"])
         self.assertEqual(app.session_state["resultado_id"],resultado)
         app.number_input(key="entrada_qtd").set_value(8).run()
         with self.assertRaises(KeyError):

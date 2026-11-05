@@ -127,7 +127,7 @@ class FretesTests(unittest.TestCase):
         r=self.calcular(despesas,moeda_apresentacao='BRL',cotacoes=[cambio()])
         self.assertEqual(r['total_consolidado']['minimo'],510)
         self.assertEqual(r['cotacoes_usadas'][0]['fonte'],'Cotação simulada de teste')
-        self.assertIsNone(self.calcular(despesas,cotacoes=[cambio()])['total_consolidado']) # não inverte BRL/USD
+        self.assertEqual(self.calcular(despesas,cotacoes=[cambio()])['total_consolidado']['minimo'],102) # inversão explícita: BRL/USD = 1/5
         for taxa in (0,-1,float('nan'),True):
             with self.assertRaises(ErroDespesas):
                 self.calcular(cotacoes=[cambio(taxa=taxa)])

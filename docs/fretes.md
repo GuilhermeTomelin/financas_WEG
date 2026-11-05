@@ -190,3 +190,14 @@ responsabilidades, API comercial de frete, prazos novos ou preço sugerido. A
 calculadora de capacidade mantém suas limitações de grade e não certifica estufagem.
 
 As capturas de entrada e resumo logístico em desktop/celular estão em `docs/capturas/fretes-*.png`. A conferência no Chrome não substitui uma auditoria em todos os navegadores.
+
+
+## Atualização: mecanismo monetário compartilhado
+
+A etapa de unificação substitui as regras de câmbio/arredondamento descritas
+originalmente acima: agora simulador e despesas compartilham `calculos/monetario.py`,
+`calculos/cambio.py` e o mesmo conjunto da sessão. São apresentadas BRL e a moeda
+escolhida; inversão explícita é permitida, sem triangulação. CLP usa zero casas,
+as outras moedas habilitadas usam duas, com ROUND_HALF_UP por linha. O total é a
+soma dos itens exibidos. O histórico antigo não é recalculado por essa mudança.
+Consulte [o contrato atual e as regras completas](cambio.md).

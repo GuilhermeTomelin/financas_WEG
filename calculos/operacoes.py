@@ -8,7 +8,7 @@ def calcular_estimativa(preco_unitario, quantidade, cotacao):
         raise ValueError("A cotação deve ser maior que zero.")
 
     total_original = preco_unitario * quantidade
-    total_convertido = total_original * cotacao
+    total_convertido = converter_faixa(dict(minimo=total_original,maximo=total_original,referencia_superior=None),cotacao)["minimo"]
 
     return {
         "total_original": total_original,
@@ -19,22 +19,22 @@ def calcular_subtotal_faixa(variante, quantidade):
     if type(quantidade) is not int or quantidade < 1:
         raise ValueError("A quantidade deve ser um número inteiro maior que zero.")
 
-    minimo = variante["minimo"]
-    maximo = variante["maximo"]
-    referencia = variante.get("referencia_superior")
+    from decimal import Decimal
+    from calculos.monetario import faixa, multiplicar
+    totais=multiplicar(faixa(variante),Decimal(quantidade))
+    # Preserva os tipos numéricos do contrato legado, calculando em decimal.
+    return {campo: None if valor is None else int(valor) if type(variante.get(campo)) is int
+            else float(valor) if type(variante.get(campo)) is float else valor
+            for campo,valor in totais.items()}
 
-    return {
-        "minimo": minimo * quantidade,
-        "maximo": maximo * quantidade if maximo is not None else None,
-        "referencia_superior": referencia * quantidade if referencia is not None else None,
-    }
 
-def converter_faixa(subtotal, cotacao):
-    """Converte os valores da faixa e preserva os limites em aberto."""
-    if cotacao <= 0:
-        raise ValueError("A cotação deve ser maior que zero.")
+def converter_faixa(subtotal, cotacao, moeda_destino=None):
+    """Adaptador compatível: sem moeda mantém saída numérica sem arredondar.
 
-    return {
-        campo: valor * cotacao if valor is not None else None
-        for campo, valor in subtotal.items()
-    }
+    Novas telas usam a consolidação com moeda explícita e valores Decimal.
+    """
+    from calculos.monetario import decimal, multiplicar, faixa, arredondar
+    convertido=multiplicar(faixa(subtotal),decimal(cotacao,"Cotação",positivo=True))
+    if moeda_destino is not None:
+        return arredondar(convertido,moeda_destino)
+    return {k:float(v) if v is not None else None for k,v in convertido.items()}

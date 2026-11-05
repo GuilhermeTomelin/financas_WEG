@@ -206,3 +206,19 @@ logística no histórico junto à operação financeira. Mercadoria e logística
 separadas; impostos ainda não compõem um custo completo ao cliente.
 
 Veja [modelos, fórmulas, seguro, moedas e limitações](docs/fretes.md).
+
+
+## Conversão unificada de moedas
+
+Produtos e despesas usam o mesmo conjunto de referências Frankfurter v2.
+O simulador e a página de fretes mostram originais, taxas e resultados em **BRL**
+e na **moeda escolhida**, sem coluna duplicada quando a escolha é BRL. A soma é
+rotulada **Subtotal de mercadorias + logística** e continua sem impostos.
+
+Atualize pelo botão de conversão da página. O lote usa data coerente, permite
+inversão explícita e reaproveita referências da sessão ao navegar. Sem taxa ou
+valor necessário, o total fica parcial/indisponível, preservando os originais.
+A comparação manual permanece separada e identificada. O histórico mostra as
+taxas e valores originalmente salvos, sem atualização silenciosa.
+
+Veja [contrato das taxas, fontes, arredondamento e exemplo reproduzível](docs/cambio.md).

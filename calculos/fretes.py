@@ -1,7 +1,6 @@
 """Despesas logísticas selecionadas. Sem rede, impostos ou responsabilidades contratuais."""
 from copy import deepcopy
-from datetime import date
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from decimal import Decimal
 import hashlib
 import json
 import re
@@ -15,59 +14,9 @@ BASES=("operacao","conteiner","produto","percentual")
 CATEGORIAS=("terrestre_origem","origem","documentacao","maritimo","seguro","destino","terrestre_destino","outras")
 
 
-class ErroDespesas(ValueError):
-    pass
-
-
-def decimal(valor, campo, positivo=False):
-    if isinstance(valor,bool) or not isinstance(valor,(str,int,float,Decimal)):
-        raise ErroDespesas(f"{campo}: informe número {'positivo' if positivo else 'não negativo'}.")
-    try:
-        n=D(str(valor))
-    except InvalidOperation as erro:
-        raise ErroDespesas(f"{campo}: número inválido.") from erro
-    if not n.is_finite() or (n <= 0 if positivo else n < 0):
-        raise ErroDespesas(f"{campo}: número finito {'positivo' if positivo else 'não negativo'} necessário.")
-    return n
-
-
-def moeda(codigo):
-    if not isinstance(codigo,str) or not re.fullmatch(r"[A-Z]{3}",codigo):
-        raise ErroDespesas("Moeda deve ser um código de três letras maiúsculas.")
-    return codigo
-
-
-def faixa(valor):
-    if isinstance(valor,dict):
-        minimo=decimal(valor.get("minimo"),"Mínimo monetário")
-        maximo=decimal(valor["maximo"],"Máximo monetário") if valor.get("maximo") is not None else None
-        ref=decimal(valor["referencia_superior"],"Referência superior") if valor.get("referencia_superior") is not None else None
-        if (maximo is not None and maximo < minimo) or (ref is not None and ref < minimo):
-            raise ErroDespesas("Faixa monetária ou referência superior invertida.")
-        return dict(minimo=minimo,maximo=maximo,referencia_superior=ref)
-    v=decimal(valor,"Valor monetário")
-    return dict(minimo=v,maximo=v,referencia_superior=None)
-
-
-def multiplicar(f,fator):
-    if fator==0:
-        return faixa(0)
-    return {k:v*fator if v is not None else None for k,v in f.items()}
-
-
-def somar(faixas):
-    faixas=list(faixas)
-    if not faixas:
-        return faixa(0)
-    aberto=any(f["maximo"] is None for f in faixas)
-    superiores=[f["maximo"] if f["maximo"] is not None else f.get("referencia_superior") for f in faixas]
-    return dict(minimo=sum((f["minimo"] for f in faixas),D(0)),
-                maximo=None if aberto else sum((f["maximo"] for f in faixas),D(0)),
-                referencia_superior=sum(superiores,D(0)) if aberto and all(v is not None for v in superiores) else None)
-
-
-def arredondar(f):
-    return {k:v.quantize(D('.01'),rounding=ROUND_HALF_UP) if v is not None else None for k,v in f.items()}
+from calculos.monetario import (ErroMonetario as ErroDespesas, decimal, moeda, faixa,
+                                 multiplicar, somar, arredondar)
+from calculos.cambio import ConjuntoCotacoes
 
 
 def validar_despesas(despesas):
@@ -134,7 +83,7 @@ def _erro_json(valor):
 
 
 def calcular_logistica(variante,quantidade,conteiner,origem,destino,moeda_apresentacao,despesas,
-                       declaracao=None,cotacoes=(),quantidade_manual=None,tarifa=None,locais=None):
+                       declaracao=None,cotacoes=(),quantidade_manual=None,tarifa=None,locais=None,conjunto=None):
     for codigo in (origem,destino):
         if not isinstance(codigo,str) or not re.fullmatch(r"[A-Z]{2}[A-Z2-9]{3}",codigo):
             raise ErroDespesas("Portos devem usar identificadores UN/LOCODE completos.")
@@ -155,30 +104,11 @@ def calcular_logistica(variante,quantidade,conteiner,origem,destino,moeda_aprese
         pendencias.extend(capacidade['motivos'])
     elif not capacidade['atende']:
         pendencias.append(f"Quantidade de contêineres insuficiente: {capacidade['unidades_nao_atendidas']} unidades de embarque não atendidas. Não representa transporte completo do lote.")
-    taxas={}
-    for q in cotacoes:
-        origem_q,destino_q=moeda(q.get('origem')),moeda(q.get('destino'))
-        taxa=decimal(q.get('cotacao'),'Cotação',positivo=True)
-        if not q.get('fonte'):
-            raise ErroDespesas("Fonte da cotação ausente.")
-        if q.get('data_referencia') is not None:
-            try:
-                date.fromisoformat(q['data_referencia'])
-            except (TypeError,ValueError) as erro:
-                raise ErroDespesas("Data da cotação inválida.") from erro
-        taxas[(origem_q,destino_q)]=dict(q,cotacao=taxa)
-    usadas={}
-    faltantes=set()
+    conjunto=conjunto or ConjuntoCotacoes(cotacoes)
+    usadas=conjunto.usadas
+    faltantes=conjunto.faltantes
     def converter(f,de,para):
-        if de==para:
-            usadas[(de,para)]=dict(origem=de,destino=para,cotacao=D(1),fonte='Identidade da mesma moeda',data_referencia=None)
-            return f
-        q=taxas.get((de,para))
-        if q is None:
-            faltantes.add((de,para))
-            return None
-        usadas[(de,para)]=q
-        return multiplicar(f,q['cotacao'])
+        return conjunto.converter(f,de,para)
     calculados={}
     def calcular_item(id_):
         if id_ in calculados:
@@ -234,10 +164,10 @@ def calcular_logistica(variante,quantidade,conteiner,origem,destino,moeda_aprese
                 return item
             fator={'operacao':1,'conteiner':n,'produto':quantidade}[d['base']]
             total=multiplicar(faixa(d['valor']),D(fator))
-        item['total_original']=arredondar(total)
+        item['total_original']=arredondar(total,d['moeda'])
         convertido=converter(item['total_original'],d['moeda'],moeda_apresentacao)
         if convertido is not None:
-            item['total_convertido']=arredondar(convertido)
+            item['total_convertido']=arredondar(convertido,moeda_apresentacao)
         else:
             item['pendencias'].append(f"{d['nome']}: falta cotação {d['moeda']} → {moeda_apresentacao}.")
         return item
@@ -259,19 +189,20 @@ def calcular_logistica(variante,quantidade,conteiner,origem,destino,moeda_aprese
             convertidas.append(item['total_convertido'])
         else:
             conversao_incompleta=True
-    conhecido=None if conversao_incompleta or (not convertidas and pendencias) else arredondar(somar(convertidas))
+    conhecido=None if conversao_incompleta or (not convertidas and pendencias) else arredondar(somar(convertidas),moeda_apresentacao)
+    pendencias.extend(conjunto.problemas)
     pendencias=list(dict.fromkeys(pendencias))
     completo=not pendencias
     return dict(estado='completo' if completo else 'parcial',pendencias=pendencias,moeda_apresentacao=moeda_apresentacao,
                 capacidade=capacidade,quantidade_conteineres=n,origem_quantidade='manual' if quantidade_manual is not None else 'estimada pela calculadora',
                 frete_maritimo=calculados.get('frete_maritimo'),despesas=itens,
-                subtotais_por_moeda={m:arredondar(somar(fs)) for m,fs in subtotais.items()},
-                por_categoria={c:{m:arredondar(somar(fs)) for m,fs in moedas.items()} for c,moedas in categorias.items()},
+                subtotais_por_moeda={m:arredondar(somar(fs),m) for m,fs in subtotais.items()},
+                por_categoria={c:{m:arredondar(somar(fs),m) for m,fs in moedas.items()} for c,moedas in categorias.items()},
                 total_logistico_conhecido=conhecido,total_consolidado=conhecido if completo else None,
-                total_por_produto=arredondar(multiplicar(conhecido,D(1)/quantidade)) if conhecido is not None and capacidade['atende'] else None,
+                total_por_produto=arredondar(multiplicar(conhecido,D(1)/quantidade),moeda_apresentacao) if conhecido is not None and capacidade['atende'] else None,
                 cotacoes_usadas=list(usadas.values()),pares_faltantes=[list(p) for p in sorted(faltantes)],
                 premissas=dict(declaracao=deepcopy(declaracao),locais=deepcopy(locais or {}),tarifa=deepcopy(tarifa),
-                               arredondamento='ROUND_HALF_UP: duas casas por total de despesa na moeda original, por conversão e por custo unitário; somam-se as linhas arredondadas.',
+                               arredondamento='ROUND_HALF_UP por moeda: CLP sem casas, demais moedas habilitadas com duas. Somam-se as linhas arredondadas, sem novo fator de cobrança na conversão.',
                                escopo='Despesas selecionadas da simulação, sem definir responsabilidades contratuais, impostos ou custo completo ao cliente.'))
 
 

@@ -41,8 +41,10 @@ def main():
             cdp("Emulation.setDeviceMetricsOverride",dict(width=largura,height=altura,deviceScaleFactor=1,mobile=False,screenWidth=largura,screenHeight=altura))
             for nome,caminho in (("dashboard",""),("simulador","simulador"),("produtos","produtos"),("historico","historico"),("conteineres","conteineres"),("fretes","rotas")):
                 cdp("Page.navigate",dict(url="http://127.0.0.1:8507/"+caminho))
+                titulo={"dashboard":"Dashboard","simulador":"Simulador","produtos":"Produtos","historico":"Histórico e relatórios","conteineres":"Contêineres","fretes":"Fretes e rotas"}[nome]
+                marcador={"simulador":"Mercadorias e logística por moeda","conteineres":"Resumo da carga","fretes":"Resumo logístico"}.get(nome,titulo)
                 for _ in range(150):
-                    pronto=avaliar("Boolean(document.querySelector('h1') && document.querySelectorAll('[data-testid=stSkeleton]').length === 0)")
+                    pronto=avaliar("Boolean(document.querySelector('h1')?.textContent === " + json.dumps(titulo) + " && document.body.innerText.includes(" + json.dumps(marcador) + ") && document.querySelectorAll('[data-testid=stSkeleton]').length === 0)")
                     if pronto:
                         break
                     time.sleep(.2)
@@ -60,6 +62,8 @@ def main():
                     raise RuntimeError("Servidor não está exibindo a calculadora atual; reinicie o Streamlit antes de capturar.")
                 if nome == "fretes" and not avaliar("document.body.innerText.includes('Resumo logístico')"):
                     raise RuntimeError("Servidor não está exibindo a simulação logística atual; reinicie o Streamlit.")
+                if nome in ("simulador","fretes") and not avaliar("document.body.innerText.includes('Mercadorias e logística por moeda')"):
+                    raise RuntimeError("Servidor não está exibindo a consolidação monetária atual; reinicie o Streamlit.")
                 if resumo["erro"] or resumo["scroll"]>largura:
                     raise RuntimeError(resumo)
                 captura=cdp("Page.captureScreenshot",dict(format="png",captureBeyondViewport=False))
@@ -67,6 +71,11 @@ def main():
                 arquivo.write_bytes(base64.b64decode(captura["data"]))
                 relatorio.append(dict(pagina=nome,tamanho=tamanho,arquivo=arquivo.name,**resumo))
                 print(nome,tamanho,resumo)
+                if nome == "simulador":
+                    avaliar("[...document.querySelectorAll('h2,h3')].find(e=>e.textContent==='Mercadorias e logística por moeda').scrollIntoView({block:'start'})")
+                    time.sleep(.3)
+                    captura_cambio=cdp("Page.captureScreenshot",dict(format="png",captureBeyondViewport=False))
+                    (destino/f"conversao-{tamanho}.png").write_bytes(base64.b64decode(captura_cambio["data"]))
                 if nome == "fretes":
                     avaliar("[...document.querySelectorAll('h2,h3')].find(e=>e.textContent==='Resumo logístico').scrollIntoView({block:'start'})")
                     time.sleep(.3)

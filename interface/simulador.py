@@ -8,12 +8,16 @@ from html import escape
 import streamlit as st
 
 from calculos.operacoes import calcular_subtotal_faixa, converter_faixa
-from consumo.cambio import ErroCambio, consultar_cotacao, MOEDAS_SUPORTADAS
+from consumo.cambio import ErroCambio, consultar_cotacao, MOEDAS_SUPORTADAS, atualizar_cotacoes, obter_cache_sessao
 from consumo.catalogo import ErroCatalogo, carregar_dados_simulador
 from consumo.logistica import validar_variante
 from consumo.conteineres import carregar_conteineres
 from consumo.fretes import carregar_fretes, buscar_tarifa
-from calculos.fretes import cenario_compativel
+from calculos.fretes import cenario_compativel, serializar, assinatura_contexto
+from calculos.consolidacao import consolidar_operacao
+from calculos.cambio import ConjuntoCotacoes
+from calculos.monetario import decimal
+from interface.conversao import exibir_consolidacao
 from interface.resumo_logistico import exibir_resumo, texto_faixa
 from consumo.portos import (carregar_portos, nome_pais, rotulo_porto, buscar_portos,
                             garantir_selecao, invalidar_resultado, consultar_rota, dados_localidade)
@@ -29,6 +33,7 @@ def exibir():
     except ErroCatalogo as erro:
         st.error(str(erro))
         return
+    obter_cache_sessao(st.session_state)
     moeda_base = catalogo["moeda"]
     cabecalho("Simulador", "Monte a operação e compare o valor da mercadoria em outra moeda.", "OPERAÇÕES")
 
@@ -123,23 +128,39 @@ def exibir():
     logistica = cenario_compativel(st.session_state.get("logistica_ativa"), produto["id"], variante, quantidade,
                                   origem_codigo, destino_codigo, tipo_conteiner, moeda_destino)
 
-    # Só a cotação é reutilizada. O subtotal acompanha a seleção atual.
-    par = (moeda_base, moeda_destino)
-    if st.session_state.get("par_cambio") != par:
-        st.session_state["par_cambio"] = par
-        st.session_state.pop("cambio_simulador", None)
-        st.session_state.pop("falha_cambio", None)
-
+    # A moeda pode mudar mantendo despesas de um contexto físico idêntico.
+    if logistica is None:
+        ativa=st.session_state.get("logistica_ativa")
+        antiga=(ativa or {}).get("entradas",{}).get("moeda")
+        if antiga:
+            logistica=cenario_compativel(ativa,produto["id"],variante,quantidade,origem_codigo,destino_codigo,tipo_conteiner,antiga)
+    cotacoes=obter_cache_sessao(st.session_state)
+    def calcular_conjunto(taxas):
+        return consolidar_operacao(variante,quantidade,moeda_base,moeda_destino,taxas,
+                                    logistica=logistica["entradas"] if logistica else None)
+    consolidacao=calcular_conjunto(list(cotacoes.values()))
     if calcular:
-        st.session_state.pop("cambio_simulador", None)
-        st.session_state.pop("falha_cambio", None)
-        try:
-            with st.spinner("Consultando a Frankfurter…"):
-                st.session_state["cambio_simulador"] = consultar_cotacao(*par)
-        except ErroCambio:
-            st.session_state["falha_cambio"] = True
-
-    cambio = st.session_state.get("cambio_simulador")
+        with st.spinner("Consultando a Frankfurter…"):
+            cotacoes,consolidacao,erros=atualizar_cotacoes(calcular_conjunto,consultar_cotacao)
+            st.session_state["cotacoes_sessao"]=cotacoes
+            if erros:
+                st.session_state["falha_cambio"]=True
+                for erro in erros:
+                    st.warning(erro)
+            else:
+                st.session_state.pop("falha_cambio",None)
+    cambio=consolidacao["itens"][0]["taxas"][moeda_destino]
+    if calcular:
+        if cambio:
+            st.session_state["cambio_simulador"]=cambio
+        else:
+            st.session_state.pop("cambio_simulador",None)
+    if logistica:
+        logistica["entradas"]["moeda"]=moeda_destino
+        logistica["entradas"]["cotacoes"]=serializar(list(cotacoes.values()))
+        logistica.update(assinatura=assinatura_contexto(produto["id"],variante,quantidade,origem_codigo,destino_codigo,tipo_conteiner,moeda_destino),
+                         resultado=serializar(consolidacao["resultado_logistica"]),consolidacao=serializar(consolidacao))
+        st.session_state["logistica_ativa"]=logistica
 
     with principal.container(key="resumo", border=True):
         st.html('<div class="rotulo">Resumo da operação</div>')
@@ -149,7 +170,7 @@ def exibir():
         st.divider()
 
         if cambio:
-            faixa_destaque = converter_faixa(subtotal, cambio["cotacao"])
+            faixa_destaque = consolidacao["itens"][0]["convertidos"][moeda_destino]
             codigo_destaque = moeda_destino
         else:
             faixa_destaque = subtotal
@@ -165,15 +186,20 @@ def exibir():
         mostrar_referencia(faixa_destaque, codigo_destaque)
 
         if cambio:
-            st.divider()
-            st.html("<p><strong>Subtotal em reais:</strong> " + escape(mostrar_faixa(subtotal, moeda_base)) + "</p>")
-            mostrar_referencia(subtotal, moeda_base)
+            if moeda_destino != moeda_base:
+                st.divider()
+                st.html("<p><strong>Subtotal em BRL:</strong> " + escape(mostrar_faixa(subtotal, moeda_base)) + "</p>")
+                mostrar_referencia(subtotal, moeda_base)
+            else:
+                st.caption("Mesma moeda: fator 1 local, sem consulta externa.")
         elif st.session_state.get("falha_cambio"):
             st.warning(
                 "Cotação indisponível. Clique em Calcular conversão para tentar novamente."
             )
         else:
             st.caption("Clique em Calcular conversão para consultar o câmbio.")
+
+    exibir_consolidacao(consolidacao, compacto=True)
 
     with principal.container(border=True, key="card_logistica_simulador"):
         st.subheader("Logística selecionada")
@@ -193,11 +219,11 @@ def exibir():
                                              value=None, format="%.6f", key=f"entrada_taxa_{moeda_destino}")
                     valido = manual is not None and math.isfinite(manual) and manual > 0
                     if valido:
-                        negociado = converter_faixa(subtotal, manual)
+                        negociado = converter_faixa(subtotal, manual, moeda_destino)
                         diferenca = negociado["minimo"] - faixa_destaque["minimo"]
-                        percentual = (manual / cambio["cotacao"] - 1) * 100
+                        percentual = (decimal(manual,"Taxa manual") / decimal(cambio["cotacao"],"Cotação") - 1) * 100
                         comparacao = dict(taxa=manual, negociado=negociado, diferenca=diferenca,
-                                          percentual=percentual)
+                                          percentual=percentual, cotacao_manual=dict(origem=moeda_base,destino=moeda_destino,cotacao=manual,metodo="manual",provedor="Usuário",fonte="Informado manualmente para comparação; não substitui o conjunto automático",data_referencia=None,consultado_em=None))
                         st.write("Referência", mostrar_faixa(faixa_destaque, moeda_destino))
                         st.write("Hipótese negociada", mostrar_faixa(negociado, moeda_destino))
                         st.caption(f"Impacto sobre o mínimo: {moeda(diferenca, moeda_destino)} "
@@ -209,9 +235,10 @@ def exibir():
                         variante=variante["nome"], quantidade=quantidade, origem=origem, pais=pais, pais_iso=destino_iso,
                         origem_unlocode=origem_codigo, destino_unlocode=destino_codigo, rota_comercial=rota_comercial,
                         destino=destino, moeda=moeda_destino, moeda_base=moeda_base, unitario=variante,
-                        subtotal=subtotal, convertido=faixa_destaque, cambio=cambio, fonte_cambio="Frankfurter",
+                        subtotal=subtotal, convertido=faixa_destaque, cambio=cambio, fonte_cambio=cambio.get("provedor") if cambio else None,
                         tipo_preco="simulado", fonte_preco=catalogo["fonte_preco"], comparacao=comparacao,
-                        tipo_conteiner=tipo_conteiner, logistica=logistica)
+                        tipo_conteiner=tipo_conteiner, logistica=logistica, consolidacao=consolidacao)
+        operacao=serializar(operacao)
         if calcular or operacao != st.session_state.get("fotografia"):
             st.session_state.fotografia = operacao
             st.session_state.resultado_id = uuid4().hex
@@ -239,7 +266,7 @@ def exibir():
             st.caption(f"Fonte do preço: {catalogo['fonte_preco']}")
 
         with item_cambio:
-            st.caption("Cotação aplicada · API Frankfurter")
+            st.caption("Cotação aplicada · " + (cambio.get("provedor", "Metadados legados") if cambio else "Referência indisponível"))
             if cambio:
                 taxa = moeda(cambio["cotacao"], cambio["destino"], casas=4)
                 st.write(f"{moeda(1, cambio['origem'])} = {taxa}")

@@ -33,13 +33,14 @@ class InterfacePortosTests(unittest.TestCase):
         fake = dict(origem="BRL", destino="EUR", cotacao=.2, data_referencia="2026-11-05")
         with patch("interface.simulador.consultar_cotacao", return_value=fake):
             next(b for b in app.button if b.label == "Calcular conversão").click().run()
-        self.assertEqual(app.session_state["cambio_simulador"]["cotacao"], .2)
+        self.assertEqual(float(app.session_state["cambio_simulador"]["cotacao"]), .2)
         outro = next(c for c in carregar_portos()[0]["portos"] if c.startswith("IT") and c != "ITGIT")
         app.selectbox(key="entrada_porto_destino").set_value(outro).run()
         with self.assertRaises(KeyError):
             app.session_state["cambio_simulador"]
         self.assertFalse(app.exception)
-        self.assertTrue(next(b for b in app.button if b.label == "Salvar simulação").disabled)
+        self.assertEqual(app.session_state["fotografia"]["destino_unlocode"], outro)
+        self.assertEqual(app.session_state["fotografia"]["consolidacao"]["moeda_apresentacao"], "EUR")
         with patch("interface.simulador.consultar_cotacao", return_value=fake):
             next(b for b in app.button if b.label == "Calcular conversão").click().run()
         app.selectbox(key="entrada_destino_iso").set_value("DE").run()

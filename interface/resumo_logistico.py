@@ -26,16 +26,16 @@ def total_item(item,convertido=False,codigo=None):
     return texto_faixa(item['total_convertido'] if convertido else item['total_original'],codigo if convertido else item['moeda'])
 
 
-def texto_faixa(f,codigo):
+def texto_faixa(f,codigo,casas=2):
     if f is None:
         return 'Indisponível'
-    minimo=f"{codigo} {numero_br(Decimal(str(f['minimo'])))}"
+    minimo=f"{codigo} {numero_br(Decimal(str(f['minimo'])),casas)}"
     if f['maximo'] is None:
         ref=f.get('referencia_superior')
-        return f"A partir de {minimo}" + (f" · referência superior {codigo} {numero_br(Decimal(str(ref)))} (não é teto)" if ref is not None else '')
+        return f"A partir de {minimo}" + (f" · referência superior {codigo} {numero_br(Decimal(str(ref)),casas)} (não é teto)" if ref is not None else '')
     if Decimal(str(f['minimo']))==Decimal(str(f['maximo'])):
         return minimo
-    return minimo+f" a {codigo} {numero_br(Decimal(str(f['maximo'])))}"
+    return minimo+f" a {codigo} {numero_br(Decimal(str(f['maximo'])),casas)}"
 
 
 def exibir_resumo(resultado,compacto=False):

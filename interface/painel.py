@@ -189,7 +189,7 @@ def integracoes():
         st.badge("Implementada · consulta sob demanda",color="blue",icon=":material/currency_exchange:")
         st.subheader("Frankfurter")
         st.write("Câmbio de referência consultado ao calcular uma conversão no simulador.")
-        cambio=st.session_state.get("cambio_simulador")
+        cambio=st.session_state.get("cambio_simulador") or next(iter(st.session_state.get("cotacoes_sessao",{}).values()),None)
         if st.session_state.get("falha_cambio"):
             st.warning("A última consulta desta sessão falhou. Uma nova tentativa pode ser feita no simulador.")
         elif cambio:

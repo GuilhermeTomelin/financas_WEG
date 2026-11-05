@@ -38,6 +38,12 @@ def exibir(moeda, faixa, numero, registros):
                        "Taxa": numero(r["cambio"]["cotacao"], 6)} for r in registros], hide_index=True)
         with st.expander("Consultar registro completo"):
             registro = st.selectbox("Simulação", registros, format_func=lambda r: f"#{r['id']} · {r['produto']} · {r['pais']}")
+            if registro.get("consolidacao"):
+                from interface.conversao import exibir_consolidacao
+                st.caption("Valores e taxas salvos na operação; nenhuma consulta ou atualização é feita ao abrir o histórico.")
+                exibir_consolidacao(registro["consolidacao"], compacto=True)
+            else:
+                st.caption("Registro legado: consolidação em duas moedas e metadados completos da consulta não foram registrados. São exibidos os valores originalmente salvos.")
             if registro.get("logistica"):
                 from interface.resumo_logistico import exibir_resumo
                 st.caption("Fotografia logística salva; não é recalculada com tarifas atuais.")
@@ -85,7 +91,7 @@ def exibir(moeda, faixa, numero, registros):
         elegiveis = [r for r in registros if r.get("comparacao")]
         if elegiveis:
             codigo = st.selectbox("Moeda da comparação", sorted({r["moeda"] for r in elegiveis}))
-            linhas = [{"Operação": f"#{r['id']}", "Diferença": r["comparacao"]["diferenca"],
+            linhas = [{"Operação": f"#{r['id']}", "Diferença": float(r["comparacao"]["diferenca"]),
                        "Impacto": moeda(r["comparacao"]["diferenca"], codigo)}
                       for r in elegiveis if r["moeda"] == codigo]
             st.caption(f"{len(linhas)} operação(ões) · Subtotal mínimo · Taxa manual menos referência, em {codigo}")
