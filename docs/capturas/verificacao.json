@@ -60,6 +60,18 @@
     "legenda": "rgb(88, 104, 127)"
   },
   {
+    "pagina": "fretes",
+    "tamanho": "desktop",
+    "arquivo": "fretes-desktop.png",
+    "titulo": "Fretes e rotas",
+    "largura": 1440,
+    "scroll": 1440,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
     "pagina": "dashboard",
     "tamanho": "mobile",
     "arquivo": "dashboard-mobile.png",
@@ -112,6 +124,18 @@
     "tamanho": "mobile",
     "arquivo": "conteineres-mobile.png",
     "titulo": "Contêineres",
+    "largura": 390,
+    "scroll": 390,
+    "erro": null,
+    "sidebar": "rgb(16, 28, 68)",
+    "fundo": "rgb(245, 247, 251)",
+    "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "fretes",
+    "tamanho": "mobile",
+    "arquivo": "fretes-mobile.png",
+    "titulo": "Fretes e rotas",
     "largura": 390,
     "scroll": 390,
     "erro": null,

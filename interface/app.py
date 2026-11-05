@@ -7,7 +7,7 @@ st.set_page_config(page_title="Finanças WEG · Comércio internacional", page_i
 aplicar()
 # Preserva seleções dos widgets que deixam de aparecer ao trocar de página.
 for chave in list(st.session_state):
-    if chave.startswith(("entrada_", "variante_", "catalogo_", "consulta_", "rel_", "conteiner_")) or chave in ("periodo", "paises", "produtos"):
+    if chave.startswith(("entrada_", "variante_", "catalogo_", "consulta_", "rel_", "conteiner_", "frete_")) or chave in ("periodo", "paises", "produtos"):
         st.session_state[chave] = st.session_state[chave]
 
 st.logo(str(Path(__file__).parent / "assets" / "marca.svg"), size="large",

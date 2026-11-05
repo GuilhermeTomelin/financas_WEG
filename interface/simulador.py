@@ -11,6 +11,10 @@ from calculos.operacoes import calcular_subtotal_faixa, converter_faixa
 from consumo.cambio import ErroCambio, consultar_cotacao, MOEDAS_SUPORTADAS
 from consumo.catalogo import ErroCatalogo, carregar_dados_simulador
 from consumo.logistica import validar_variante
+from consumo.conteineres import carregar_conteineres
+from consumo.fretes import carregar_fretes, buscar_tarifa
+from calculos.fretes import cenario_compativel
+from interface.resumo_logistico import exibir_resumo, texto_faixa
 from consumo.portos import (carregar_portos, nome_pais, rotulo_porto, buscar_portos,
                             garantir_selecao, invalidar_resultado, consultar_rota, dados_localidade)
 
@@ -21,6 +25,7 @@ def exibir():
     try:
         catalogo, rotas = carregar_dados_simulador()
         base_portos, navegacao = carregar_portos()
+        equipamentos = {c["id"]:c for c in carregar_conteineres()}
     except ErroCatalogo as erro:
         st.error(str(erro))
         return
@@ -99,10 +104,12 @@ def exibir():
             st.divider()
             st.markdown("#### Apresentação do resultado")
             moeda_destino = st.selectbox("Moeda de apresentação", MOEDAS_SUPORTADAS, key="entrada_moeda_apresentacao")
+            garantir_selecao(st.session_state, "entrada_tipo_conteiner", list(equipamentos), st.session_state.get("conteiner_tipo", "dry20"))
+            tipo_conteiner = st.selectbox("Tipo de contêiner para logística", list(equipamentos), format_func=lambda i:equipamentos[i]["nome"], key="entrada_tipo_conteiner")
         rota = f"{origem['porto']} ({origem_codigo}) → {destino['porto']} ({destino_codigo})"
         rota_comercial = consultar_rota(navegacao, origem_codigo, destino_codigo)
         invalidar_resultado(st.session_state, (produto["id"], variante["nome"], quantidade,
-                                              origem_codigo, destino_codigo, moeda_destino))
+                                              origem_codigo, destino_codigo, moeda_destino, tipo_conteiner))
         st.caption(f"Trajeto selecionado · {rota}")
         st.caption("Localidade portuária cadastrada não comprova terminal de contêineres ou serviço comercial.")
 
@@ -113,6 +120,8 @@ def exibir():
         )
 
     subtotal = calcular_subtotal_faixa(variante, quantidade)
+    logistica = cenario_compativel(st.session_state.get("logistica_ativa"), produto["id"], variante, quantidade,
+                                  origem_codigo, destino_codigo, tipo_conteiner, moeda_destino)
 
     # Só a cotação é reutilizada. O subtotal acompanha a seleção atual.
     par = (moeda_base, moeda_destino)
@@ -166,6 +175,14 @@ def exibir():
         else:
             st.caption("Clique em Calcular conversão para consultar o câmbio.")
 
+    with principal.container(border=True, key="card_logistica_simulador"):
+        st.subheader("Logística selecionada")
+        if logistica:
+            exibir_resumo(logistica["resultado"], compacto=True)
+        else:
+            st.info("Nenhum cenário logístico compatível com produto, lote, portos, equipamento e moeda atuais. Configure-o em Fretes e rotas.")
+        st.page_link("paginas/rotas.py", label="Configurar frete e despesas", icon=":material/route:")
+
     with principal:
         comparacao = None
         valido = bool(cambio)
@@ -193,7 +210,8 @@ def exibir():
                         origem_unlocode=origem_codigo, destino_unlocode=destino_codigo, rota_comercial=rota_comercial,
                         destino=destino, moeda=moeda_destino, moeda_base=moeda_base, unitario=variante,
                         subtotal=subtotal, convertido=faixa_destaque, cambio=cambio, fonte_cambio="Frankfurter",
-                        tipo_preco="simulado", fonte_preco=catalogo["fonte_preco"], comparacao=comparacao)
+                        tipo_preco="simulado", fonte_preco=catalogo["fonte_preco"], comparacao=comparacao,
+                        tipo_conteiner=tipo_conteiner, logistica=logistica)
         if calcular or operacao != st.session_state.get("fotografia"):
             st.session_state.fotografia = operacao
             st.session_state.resultado_id = uuid4().hex
@@ -238,15 +256,22 @@ def exibir():
 
         frete, prazo = st.columns(2)
         frete.caption("Frete marítimo")
-        frete.write("Frete indisponível para esta rota" if not rota_comercial or rota_comercial.get("frete") is None
-                    else rota_comercial["frete"])
+        if logistica:
+            item_frete = logistica["resultado"].get("frete_maritimo")
+            frete.text(texto_faixa(item_frete["total_original"], item_frete["moeda"]) if item_frete else "Frete não incluído no escopo")
+        else:
+            try:
+                tarifa_disponivel = buscar_tarifa(carregar_fretes(), origem_codigo, destino_codigo, tipo_conteiner)
+                frete.write("Tarifa simulada disponível; configure as despesas em Fretes e rotas." if tarifa_disponivel else "Frete indisponível para esta rota")
+            except ErroCatalogo:
+                frete.write("Configuração de tarifas indisponível; o subtotal da mercadoria permanece disponível.")
         prazo.caption("Prazo entre portos")
         prazo.write("Prazo indisponível para esta rota" if not rota_comercial or rota_comercial.get("prazo") is None
                     else rota_comercial["prazo"])
 
         st.caption(
-            "O subtotal inclui apenas a mercadoria. Frete, seguro, impostos "
-            "e despesas portuárias estão fora do cálculo."
+            "O subtotal da mercadoria e as despesas logísticas são apresentados separadamente. "
+            "Impostos ainda não estão implementados; os valores não são um custo completo ao cliente."
         )
 
 

@@ -38,6 +38,10 @@ def exibir(moeda, faixa, numero, registros):
                        "Taxa": numero(r["cambio"]["cotacao"], 6)} for r in registros], hide_index=True)
         with st.expander("Consultar registro completo"):
             registro = st.selectbox("Simulação", registros, format_func=lambda r: f"#{r['id']} · {r['produto']} · {r['pais']}")
+            if registro.get("logistica"):
+                from interface.resumo_logistico import exibir_resumo
+                st.caption("Fotografia logística salva; não é recalculada com tarifas atuais.")
+                exibir_resumo(registro["logistica"]["resultado"], compacto=True)
             st.json({k:v for k,v in registro.items() if k != "local"})
     with aba_relatorios:
         df = pd.DataFrame([{"País": r["pais"], "Produto": r["produto"], "Unidades": r["quantidade"],

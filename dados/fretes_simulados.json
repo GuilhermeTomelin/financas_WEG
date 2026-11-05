@@ -1,0 +1,241 @@
+{
+  "versao": 1,
+  "descricao": "Valores educacionais sem origem comercial. Nenhum custo terrestre é inferido apenas de país ou porto.",
+  "tarifas": [
+    {
+      "id": "demo_BRSSZ_ITGIT_dry20",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "ITGIT",
+      "conteiner_id": "dry20",
+      "valor_unitario": 2000,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_ITGIT_dry40",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "ITGIT",
+      "conteiner_id": "dry40",
+      "valor_unitario": 3300,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_ITGIT_hc40",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "ITGIT",
+      "conteiner_id": "hc40",
+      "valor_unitario": 3500,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_USLAX_dry20",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "USLAX",
+      "conteiner_id": "dry20",
+      "valor_unitario": 3200,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_USLAX_dry40",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "USLAX",
+      "conteiner_id": "dry40",
+      "valor_unitario": 4800,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_USLAX_hc40",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "USLAX",
+      "conteiner_id": "hc40",
+      "valor_unitario": 5100,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_MXZLO_dry20",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "MXZLO",
+      "conteiner_id": "dry20",
+      "valor_unitario": 1800,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_MXZLO_dry40",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "MXZLO",
+      "conteiner_id": "dry40",
+      "valor_unitario": 2800,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    },
+    {
+      "id": "demo_BRSSZ_MXZLO_hc40",
+      "origem_unlocode": "BRSSZ",
+      "destino_unlocode": "MXZLO",
+      "conteiner_id": "hc40",
+      "valor_unitario": 3000,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "referencia": "Hipótese didática do projeto; não é cotação de transportador.",
+      "validade": null,
+      "observacoes": "Exemplo FCL porto a porto, direcional, sem confirmação de serviço. Cobrança integral por contêiner.",
+      "despesas_incluidas": [
+        "documentacao"
+      ]
+    }
+  ],
+  "despesas_modelo": [
+    {
+      "id": "terrestre_origem",
+      "nome": "Coleta até o porto de embarque",
+      "categoria": "terrestre_origem",
+      "base": "operacao",
+      "valor": null,
+      "moeda": "BRL",
+      "natureza": "nao_informado",
+      "estado": "desconhecido",
+      "participa_total": true,
+      "incluido_em": null,
+      "componentes_base": [],
+      "observacoes": ""
+    },
+    {
+      "id": "porto_origem",
+      "nome": "Despesas portuárias de origem",
+      "categoria": "origem",
+      "base": "conteiner",
+      "valor": 450,
+      "moeda": "BRL",
+      "natureza": "simulado",
+      "estado": "conhecido",
+      "participa_total": true,
+      "incluido_em": null,
+      "componentes_base": [],
+      "observacoes": ""
+    },
+    {
+      "id": "documentacao",
+      "nome": "Documentação",
+      "categoria": "documentacao",
+      "base": "operacao",
+      "valor": null,
+      "moeda": "USD",
+      "natureza": "nao_informado",
+      "estado": "desconhecido",
+      "participa_total": true,
+      "incluido_em": null,
+      "componentes_base": [],
+      "observacoes": ""
+    },
+    {
+      "id": "frete_maritimo",
+      "nome": "Frete marítimo FCL",
+      "categoria": "maritimo",
+      "base": "conteiner",
+      "valor": null,
+      "moeda": "USD",
+      "natureza": "nao_informado",
+      "estado": "desconhecido",
+      "participa_total": true,
+      "incluido_em": null,
+      "componentes_base": [],
+      "observacoes": ""
+    },
+    {
+      "id": "seguro",
+      "nome": "Seguro da carga",
+      "categoria": "seguro",
+      "base": "percentual",
+      "valor": 0.5,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "estado": "conhecido",
+      "participa_total": true,
+      "incluido_em": null,
+      "componentes_base": [],
+      "observacoes": "Percentual didático; depende de escolha explícita dos componentes da base, sem incluir o próprio seguro."
+    },
+    {
+      "id": "porto_destino",
+      "nome": "Despesas portuárias de destino",
+      "categoria": "destino",
+      "base": "conteiner",
+      "valor": 250,
+      "moeda": "USD",
+      "natureza": "simulado",
+      "estado": "conhecido",
+      "participa_total": true,
+      "incluido_em": null,
+      "componentes_base": [],
+      "observacoes": ""
+    },
+    {
+      "id": "terrestre_destino",
+      "nome": "Do porto de destino até o cliente",
+      "categoria": "terrestre_destino",
+      "base": "operacao",
+      "valor": null,
+      "moeda": "BRL",
+      "natureza": "nao_informado",
+      "estado": "desconhecido",
+      "participa_total": true,
+      "incluido_em": null,
+      "componentes_base": [],
+      "observacoes": ""
+    }
+  ]
+}

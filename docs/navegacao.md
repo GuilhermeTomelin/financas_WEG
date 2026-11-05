@@ -11,7 +11,7 @@ mantém suas dependências existentes. Não foi feita migração de frontend.
 | Visão geral | Dashboard | Métricas calculadas a partir das bases locais, atalho para simular, histórico recente e gráfico somente quando houver registros |
 | Operações | Simulador | Fluxo existente: catálogo, variantes, quantidade, portos, câmbio, comparação manual e salvamento |
 | Operações | Contêineres | Calculadora operacional: grade uniforme, peso, volume, ocupação, quantidade automática/manual e comparação dos três equipamentos |
-| Operações | Fretes e rotas | Consulta da base UN/LOCODE com busca e informação sobre disponibilidade comercial |
+| Operações | Fretes e rotas | Simulação editável de frete/despesas e aba de consulta UN/LOCODE |
 | Operações | Impostos | Planejado: recursos tributários ainda não implementados |
 | Operações | Precificação | Planejado: análise futura de custo, margem e preço |
 | Dados e análises | Produtos | Busca e filtro de catálogo, abas Comercial e Logística, sem editor |
@@ -72,7 +72,7 @@ preservação de estado, filtros, histórico legado e telas vazias/preenchidas.
 Os registros preenchidos dos testes são fixtures, não dados de demonstração
 inseridos no banco do usuário.
 
-A pasta `docs/capturas/` contém dashboard, simulador, produtos, histórico e contêineres em
+A pasta `docs/capturas/` contém dashboard, simulador, produtos, histórico, contêineres e fretes em
 **1440 × 1050** e **390 × 844**, capturados no Chrome headless. O relatório
 `verificacao.json` registra títulos, cores de fundo e ausência de exceções e
 rolagem horizontal da página nesses viewports. São capturas da área visível,
@@ -87,3 +87,5 @@ tributos novos. Os controles operacionais continuam sendo os do Streamlit,
 com adaptação das referências, sem copiar seus elementos publicitários.
 
 Detalhes da calculadora: [fontes, fórmulas, premissas e limitações](conteineres.md).
+
+Frete e despesas: [guia de modelos, moedas, edição e histórico](fretes.md).

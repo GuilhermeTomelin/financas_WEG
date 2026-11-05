@@ -183,3 +183,26 @@ Consulte [as fontes, fórmulas, unidades e limitações](docs/conteineres.md).
 A estimativa não é otimização 3D nem plano certificado de estufagem e não inclui
 frete ou impostos. A documentação da etapa 1 descreve a base histórica; a
 calculadora antes planejada agora está disponível com este escopo.
+
+
+## Frete e despesas logísticas
+
+Abra **Fretes e rotas → Simulação logística**. Há nove tarifas FCL **simuladas**:
+Santos (`BRSSZ`) → Gioia Tauro (`ITGIT`), Los Angeles (`USLAX`) e Manzanillo
+(`MXZLO`), nos tipos `dry20`, `dry40` e `hc40`. Outros portos/equipamentos ficam
+sem tarifa automática e permitem entrada manual. Os valores não são cotações reais.
+
+Edite os itens nas abas **Origem**, **Frete marítimo**, **Seguro**, **Destino** e
+**Extras**, escolha estado/base/moeda e informe locais de coleta/entrega quando
+houver transporte terrestre. Seguro fixo usa Por operação; percentual exige
+componentes e valor declarado escolhidos explicitamente. Inclusões não são
+cobradas novamente. É possível restaurar o modelo sem alterar os arquivos.
+
+Consulte câmbio pelo botão específico. Sem taxa ou valor necessário, a tela
+mostra pendências e subtotais por moeda, sem somar moedas diferentes. Quantidade
+de contêineres é estimada pelo módulo existente ou manual, mantendo verificação
+de capacidade. **Levar cenário ao simulador para salvar** permite gravar a cópia
+logística no histórico junto à operação financeira. Mercadoria e logística ficam
+separadas; impostos ainda não compõem um custo completo ao cliente.
+
+Veja [modelos, fórmulas, seguro, moedas e limitações](docs/fretes.md).

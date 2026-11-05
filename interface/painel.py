@@ -116,15 +116,15 @@ def produtos():
         dados_logisticos(variante)
 
 
-def rotas():
-    cabecalho("Fretes e rotas", "Explore localidades portuárias e consulte o alcance dos dados comerciais cadastrados.", "OPERAÇÕES")
+def consultar_portos():
     _,base,config=dados()
     a,b,c=st.columns(3)
     a.metric("Países/territórios na base",numero_br(len(base["paises"]),0))
     b.metric("Localidades elegíveis",numero_br(len(base["portos"]),0))
-    c.metric("Rotas comerciais configuradas",numero_br(len(config["rotas"]),0))
+    c.metric("Rotas comerciais legadas",numero_br(len(config["rotas"]),0))
     with st.container(border=True,key="card_consulta_portos"):
-        pais=st.selectbox("País para consulta",list(base["paises"]),index=list(base["paises"]).index("BR"),key="consulta_pais",
+        garantir_selecao(st.session_state,"consulta_pais",list(base["paises"]),"BR")
+        pais=st.selectbox("País para consulta",list(base["paises"]),key="consulta_pais",
                           format_func=lambda iso:f"{nome_pais(base,config,iso)} · {iso}")
         busca=st.text_input("Pesquisar nome, subdivisão ou UN/LOCODE",key="consulta_busca")
         opcoes=buscar_portos(base,pais,busca,st.session_state.get("favoritos_portos",config["favoritos"]))
@@ -140,7 +140,7 @@ def rotas():
         if config["rotas"]:
             st.dataframe(config["rotas"],hide_index=True,width="stretch")
         else:
-            st.info("Frete indisponível para esta rota. Não há cotações ou prazos cadastrados para as combinações de portos.")
+            st.info("Sem cotações comerciais reais cadastradas. Os exemplos didáticos e a entrada manual estão na aba Simulação logística.")
         st.caption("Uma localidade cadastrada não é uma rota atendida. Nenhuma tarifa é criada ou replicada automaticamente.")
     with st.expander("Fonte e critérios da base"):
         meta=base["metadados"]
@@ -200,3 +200,8 @@ def integracoes():
         st.caption("Moedas habilitadas no aplicativo: "+", ".join(MOEDAS_SUPORTADAS))
     estado("ThingSpeak", "Integração prevista, ainda não implementada.", planejado=True)
     estado("API do outro projeto", "Integração futura — escopo a definir.", planejado=True)
+
+
+def rotas():
+    from interface.fretes import exibir
+    exibir()

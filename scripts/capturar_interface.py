@@ -39,7 +39,7 @@ def main():
         cdp("Page.enable")
         for tamanho,largura,altura in (("desktop",1440,1050),("mobile",390,844)):
             cdp("Emulation.setDeviceMetricsOverride",dict(width=largura,height=altura,deviceScaleFactor=1,mobile=False,screenWidth=largura,screenHeight=altura))
-            for nome,caminho in (("dashboard",""),("simulador","simulador"),("produtos","produtos"),("historico","historico"),("conteineres","conteineres")):
+            for nome,caminho in (("dashboard",""),("simulador","simulador"),("produtos","produtos"),("historico","historico"),("conteineres","conteineres"),("fretes","rotas")):
                 cdp("Page.navigate",dict(url="http://127.0.0.1:8507/"+caminho))
                 for _ in range(150):
                     pronto=avaliar("Boolean(document.querySelector('h1') && document.querySelectorAll('[data-testid=stSkeleton]').length === 0)")
@@ -58,6 +58,8 @@ def main():
                 resumo=json.loads(resumo)
                 if nome == "conteineres" and not avaliar("document.body.innerText.includes('Resumo da carga')"):
                     raise RuntimeError("Servidor não está exibindo a calculadora atual; reinicie o Streamlit antes de capturar.")
+                if nome == "fretes" and not avaliar("document.body.innerText.includes('Resumo logístico')"):
+                    raise RuntimeError("Servidor não está exibindo a simulação logística atual; reinicie o Streamlit.")
                 if resumo["erro"] or resumo["scroll"]>largura:
                     raise RuntimeError(resumo)
                 captura=cdp("Page.captureScreenshot",dict(format="png",captureBeyondViewport=False))
@@ -65,6 +67,11 @@ def main():
                 arquivo.write_bytes(base64.b64decode(captura["data"]))
                 relatorio.append(dict(pagina=nome,tamanho=tamanho,arquivo=arquivo.name,**resumo))
                 print(nome,tamanho,resumo)
+                if nome == "fretes":
+                    avaliar("[...document.querySelectorAll('h2,h3')].find(e=>e.textContent==='Resumo logístico').scrollIntoView({block:'start'})")
+                    time.sleep(.3)
+                    captura_resumo=cdp("Page.captureScreenshot",dict(format="png",captureBeyondViewport=False))
+                    (destino/f"fretes-resumo-{tamanho}.png").write_bytes(base64.b64decode(captura_resumo["data"]))
         (destino/"verificacao.json").write_text(json.dumps(relatorio,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
 

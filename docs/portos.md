@@ -118,3 +118,11 @@ python -B -m unittest discover -s tests -v
 Os testes usam a cópia local, arquivos temporários para histórico e câmbio
 simulado explicitamente nos testes da tela, sem rede. A consulta real de pares
 foi uma verificação separada; os testes não garantem disponibilidade futura.
+
+
+## Evolução: tarifas de demonstração
+
+A etapa posterior adicionou `dados/fretes_simulados.json`, com nove tarifas
+simuladas por combinação exata de portos e equipamento. O cadastro comercial
+legado acima permanece sem tarifas reais. Consulte [fretes e despesas](fretes.md):
+a presença das tarifas didáticas não confirma serviço, prazo ou cobertura comercial.
