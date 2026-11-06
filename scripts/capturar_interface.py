@@ -84,6 +84,14 @@ def main():
                     (destino/f"impostos-resultado-{tamanho}.png").write_bytes(base64.b64decode(captura_fiscal["data"]))
                     relatorio.append(dict(pagina="impostos-resultado",tamanho=tamanho,arquivo=f"impostos-resultado-{tamanho}.png",**detalhes,largura=largura))
                 if nome == "simulador":
+                    avaliar("[...document.querySelectorAll('h2,h3')].find(e=>e.textContent==='Custo da operação por perspectiva').scrollIntoView({block:'start'})")
+                    time.sleep(.3)
+                    detalhes_custo=json.loads(avaliar("JSON.stringify({erro:document.querySelector('[data-testid=stException]')?.textContent || null,scroll:document.documentElement.scrollWidth})"))
+                    if detalhes_custo['erro'] or detalhes_custo['scroll']>largura:
+                        raise RuntimeError(detalhes_custo)
+                    captura_custo=cdp("Page.captureScreenshot",dict(format="png",captureBeyondViewport=False))
+                    (destino/f"custos-{tamanho}.png").write_bytes(base64.b64decode(captura_custo["data"]))
+                    relatorio.append(dict(pagina="custos",tamanho=tamanho,arquivo=f"custos-{tamanho}.png",largura=largura,**detalhes_custo))
                     avaliar("[...document.querySelectorAll('h2,h3')].find(e=>e.textContent==='Mercadorias e logística por moeda').scrollIntoView({block:'start'})")
                     time.sleep(.3)
                     captura_cambio=cdp("Page.captureScreenshot",dict(format="png",captureBeyondViewport=False))

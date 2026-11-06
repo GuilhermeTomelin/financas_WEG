@@ -24,6 +24,14 @@
     "legenda": "rgb(88, 104, 127)"
   },
   {
+    "pagina": "custos",
+    "tamanho": "desktop",
+    "arquivo": "custos-desktop.png",
+    "largura": 1440,
+    "erro": null,
+    "scroll": 1440
+  },
+  {
     "pagina": "produtos",
     "tamanho": "desktop",
     "arquivo": "produtos-desktop.png",
@@ -114,6 +122,14 @@
     "sidebar": "rgb(16, 28, 68)",
     "fundo": "rgb(245, 247, 251)",
     "legenda": "rgb(88, 104, 127)"
+  },
+  {
+    "pagina": "custos",
+    "tamanho": "mobile",
+    "arquivo": "custos-mobile.png",
+    "largura": 390,
+    "erro": null,
+    "scroll": 390
   },
   {
     "pagina": "produtos",

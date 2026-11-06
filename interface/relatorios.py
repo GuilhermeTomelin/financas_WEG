@@ -54,6 +54,12 @@ def exibir(moeda, faixa, numero, registros):
                 exibir_resumo_tributario(registro["tributacao"],compacto=True)
             else:
                 st.caption("Tributação não registrada nesta simulação; não significa imposto zero. Registros anteriores permanecem como foram salvos.")
+            if registro.get('custos'):
+                from interface.custos import exibir_custos
+                st.caption('Consolidação de custos salva: perspectivas, responsabilidades, inclusões e resultados originais, sem recálculo.')
+                exibir_custos(registro['custos'])
+            else:
+                st.caption('Consolidação por perspectiva não registrada nesta simulação; dados ausentes não foram preenchidos retroativamente.')
             st.json({k:v for k,v in registro.items() if k != "local"})
     with aba_relatorios:
         df = pd.DataFrame([{"País": r["pais"], "Produto": r["produto"], "Unidades": r["quantidade"],

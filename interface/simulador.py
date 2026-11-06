@@ -14,7 +14,8 @@ from consumo.logistica import validar_variante
 from consumo.conteineres import carregar_conteineres
 from consumo.fretes import carregar_fretes, buscar_tarifa
 from calculos.fretes import cenario_compativel, serializar, assinatura_contexto
-from calculos.consolidacao import consolidar_operacao
+from calculos.consolidacao import consolidar_operacao, consolidar_custos
+from interface.custos import configurar_custos, exibir_custos
 from calculos.tributos import aplicar_snapshot_tributario
 from interface.resumo_tributario import exibir_resumo_tributario
 from calculos.cambio import ConjuntoCotacoes
@@ -126,6 +127,10 @@ def exibir():
             width="stretch",
         )
 
+    if type(quantidade) is not int or quantidade<1:
+        invalidar_resultado(st.session_state,None)
+        st.warning('Informe uma quantidade inteira e positiva de produtos para calcular.')
+        st.stop()
     subtotal = calcular_subtotal_faixa(variante, quantidade)
     logistica = cenario_compativel(st.session_state.get("logistica_ativa"), produto["id"], variante, quantidade,
                                   origem_codigo, destino_codigo, tipo_conteiner, moeda_destino)
@@ -139,6 +144,7 @@ def exibir():
     cotacoes=obter_cache_sessao(st.session_state)
     contexto_fiscal=dict(produto_id=produto["id"],variante=variante,quantidade=quantidade,
                          origem_unlocode=origem_codigo,destino_unlocode=destino_codigo,conteiner_id=tipo_conteiner)
+    config_custos=None
     def calcular_conjunto(taxas):
         base=consolidar_operacao(variante,quantidade,moeda_base,moeda_destino,taxas,
                                 logistica=logistica["entradas"] if logistica else None)
@@ -146,8 +152,17 @@ def exibir():
         if fiscal:
             base["pares_faltantes"]=[list(p) for p in sorted({tuple(p) for p in base["pares_faltantes"]+fiscal["resultado"]["pares_faltantes"]})]
         base["tributacao"]=fiscal
+        return incluir_custos(base,taxas) if config_custos is not None else base
+    def incluir_custos(base,taxas):
+        try:
+            base['custos']=consolidar_custos(base,quantidade,config_custos,taxas,base.get('tributacao'))
+            base['pares_faltantes']=[list(p) for p in sorted({tuple(p) for p in base['pares_faltantes']+base['custos']['pares_faltantes']})]
+        except ValueError as erro:
+            base['erro_custos']=str(erro)
         return base
     consolidacao=calcular_conjunto(list(cotacoes.values()))
+    config_custos=configurar_custos(consolidacao,consolidacao.get('tributacao'),variante,contexto_fiscal)
+    consolidacao=incluir_custos(consolidacao,list(cotacoes.values()))
     if calcular:
         with st.spinner("Consultando a Frankfurter…"):
             cotacoes,consolidacao,erros=atualizar_cotacoes(calcular_conjunto,consultar_cotacao)
@@ -211,6 +226,11 @@ def exibir():
         else:
             st.caption("Clique em Calcular conversão para consultar o câmbio.")
 
+    with st.container(border=True,key='card_custos_operacao'):
+        if consolidacao.get('custos'):
+            exibir_custos(consolidacao['custos'])
+        else:
+            st.error('Consolidação de custos indisponível: '+consolidacao.get('erro_custos','Verifique as entradas.'))
     exibir_consolidacao(consolidacao, compacto=True)
 
     with principal.container(border=True, key="card_logistica_simulador"):
@@ -257,7 +277,7 @@ def exibir():
                         destino=destino, moeda=moeda_destino, moeda_base=moeda_base, unitario=variante,
                         subtotal=subtotal, convertido=faixa_destaque, cambio=cambio, fonte_cambio=cambio.get("provedor") if cambio else None,
                         tipo_preco="simulado", fonte_preco=catalogo["fonte_preco"], comparacao=comparacao,
-                        tipo_conteiner=tipo_conteiner, logistica=logistica, consolidacao=consolidacao, tributacao=tributacao)
+                        tipo_conteiner=tipo_conteiner, logistica=logistica, consolidacao=consolidacao, tributacao=tributacao, custos=consolidacao.get('custos'), entradas_custos=config_custos, erro_custos=consolidacao.get('erro_custos'))
         operacao=serializar(operacao)
         if calcular or operacao != st.session_state.get("fotografia"):
             st.session_state.fotografia = operacao

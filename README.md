@@ -243,3 +243,24 @@ subtotal acrescido dos tributos quando completo no escopo. Leve o cenário ao
 simulador para salvar sua cópia no histórico; registros antigos não são recalculados.
 
 Consulte [fontes, cenários, fórmulas, exemplos, verificações e limitações](docs/tributos.md).
+
+
+## Custo total e unitário por perspectiva
+
+O **Simulador** agora tem configuração de responsabilidades e resumo de custos
+com abas **Resumo**, **Composição dos custos** e **Responsabilidades e premissas**.
+Comprador usa preço comercial; vendedor usa fabricação ou compra, informada
+independentemente. As duas bases e os dois totais nunca são somados entre si.
+
+Defina responsável econômico, inclusões, alcance até porto ou cliente e premissas
+de cobertura. Incoterm, edição e local nomeado são registrados, com atribuição
+manual e sem matriz automática ICC. Despesas já incluídas não são duplicadas.
+O resultado mostra base, adicionais, tributos, total/unitário e acréscimo sobre a
+base, mantendo pendências, faixas e natureza dos dados. Percentuais com base
+variável ficam indisponíveis, sem ponto médio ou divisão enganosa dos extremos.
+
+Logística e tributos compatíveis são reutilizados; câmbio permanece centralizado.
+A fotografia salva inclui as condições e resultados por perspectiva, sem recálculo
+de registros antigos. Não há preço recomendado, lucro, margem ou novos tributos.
+
+Veja [fórmulas, perspectivas, inclusões, exemplos e limitações](docs/custos.md).

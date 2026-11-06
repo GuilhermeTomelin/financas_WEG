@@ -9,7 +9,7 @@ mantém suas dependências existentes. Não foi feita migração de frontend.
 | Grupo | Página | Estado e conteúdo |
 | --- | --- | --- |
 | Visão geral | Dashboard | Métricas calculadas a partir das bases locais, atalho para simular, histórico recente e gráfico somente quando houver registros |
-| Operações | Simulador | Fluxo existente: catálogo, variantes, quantidade, portos, câmbio, comparação manual e salvamento |
+| Operações | Simulador | Catálogo, portos, câmbio e salvamento; custos por comprador/vendedor, atribuição manual e inclusões, com resumo/composição/premissas |
 | Operações | Contêineres | Calculadora operacional: grade uniforme, peso, volume, ocupação, quantidade automática/manual e comparação dos três equipamentos |
 | Operações | Fretes e rotas | Simulação editável de frete/despesas e aba de consulta UN/LOCODE |
 | Operações | Impostos | Cenário, classificação, regras editáveis e memória: modo manual e dois exercícios didáticos; sem cenário legal ativado |
@@ -92,3 +92,5 @@ Frete e despesas: [guia de modelos, moedas, edição e histórico](fretes.md).
 Conversão compartilhada: [duas moedas, taxas, datas e histórico](cambio.md).
 
 Detalhes da simulação tributária e sua integração ao histórico: [tributos.md](tributos.md).
+
+Consolidação por perspectiva no simulador: [custos.md](custos.md).
